@@ -1,0 +1,6 @@
+- Clean and setup project files
+  * Add over gl_ref files *DONE*
+  * Remove the wierd linked stuff (ri.)
+  * Remove software and replace with openGL
+- Start on the shared 'shared' system, add a new share file and include it in q_shared.h
+- The first 'feature' is going to be a new particle system but keep the old style system
