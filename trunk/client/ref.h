@@ -130,6 +130,7 @@ typedef struct
 //
 // these are the functions exported by the refresh module
 //
+#if 0
 typedef struct
 {
 	// if api_version is different, the dll cannot be used
@@ -184,7 +185,7 @@ typedef struct
 	void	(*AppActivate)( qboolean activate );
 
 } refexport_t;
-
+#endif
 //
 // these are the functions imported by the refresh module
 //
@@ -223,6 +224,6 @@ typedef struct
 
 
 // this is the only function actually exported at the linker level
-typedef	refexport_t	(*GetRefAPI_t) (refimport_t);
+//typedef	refexport_t	(*GetRefAPI_t) (refimport_t);
 
 #endif // __REF_H

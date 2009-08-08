@@ -1,5 +1,7 @@
 /*
+===========================================================================
 Copyright (C) 1997-2001 Id Software, Inc.
+Copyright (C) 2008-x Evolution.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,9 +18,16 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+===========================================================================
+This file is a part of the evolution rewritten system. If any of this code
+is based of another engine or engines, names will be credited!. If you
+want to use this code please credit!
+===========================================================================
 */
-	
-// q_shared.h -- included first by ALL program modules
+
+//
+// shared.h - included first by ALL program modules, this is the main header of all .h files (this is the old q_shared)
+//
 
 #ifdef _WIN32
 // unknown pragmas are SUPPOSED to be ignored, but....
@@ -39,6 +48,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <time.h>
 
+#include "../shared/mathlib/s_mathlib.h"
+#include "s_shared.h"
+
 #if (defined _M_IX86 || defined __i386__) && !defined C_ONLY && !defined __sun__
 #define id386	1
 #else
@@ -58,7 +70,6 @@ typedef enum {false, true}	qboolean;
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
-
 
 // angle indexes
 #define	PITCH				0		// up / down

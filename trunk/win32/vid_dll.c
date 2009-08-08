@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#include "zmouse.h"
 
 // Structure containing functions exported from refresh DLL
-refexport_t	re;
+//refexport_t	re;
 
 cvar_t *win_noalttab;
 
@@ -353,7 +353,7 @@ LONG WINAPI MainWndProc (
 			AppActivate( fActive != WA_INACTIVE, fMinimized);
 
 			if ( reflib_active )
-				re.AppActivate( !( fActive == WA_INACTIVE ) );
+				GLimp_AppActivate( !( fActive == WA_INACTIVE ) );
 		}
         return DefWindowProc (hWnd, uMsg, wParam, lParam);
 
@@ -541,12 +541,13 @@ void VID_NewWindow ( int width, int height)
 	cl.force_refdef = true;		// can't use a paused refdef
 }
 
+
 void VID_FreeReflib (void)
 {
-	if ( !FreeLibrary( reflib_library ) )
-		Com_Error( ERR_FATAL, "Reflib FreeLibrary failed" );
-	memset (&re, 0, sizeof(re));
-	reflib_library = NULL;
+	//if ( !FreeLibrary( reflib_library ) )
+	//	Com_Error( ERR_FATAL, "Reflib FreeLibrary failed" );
+	//memset (&re, 0, sizeof(re));
+	//reflib_library = NULL;
 	reflib_active  = false;
 }
 
@@ -557,12 +558,12 @@ VID_LoadRefresh
 */
 qboolean VID_LoadRefresh( char *name )
 {
-	refimport_t	ri;
-	GetRefAPI_t	GetRefAPI;
+	//refimport_t	ri;
+	//GetRefAPI_t	GetRefAPI;
 	
 	if ( reflib_active )
 	{
-		re.Shutdown();
+		R_Shutdown();
 		VID_FreeReflib ();
 	}
 
@@ -575,37 +576,37 @@ qboolean VID_LoadRefresh( char *name )
 		return false;
 	}
 
-	ri.Cmd_AddCommand = Cmd_AddCommand;
-	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
-	ri.Cmd_Argc = Cmd_Argc;
-	ri.Cmd_Argv = Cmd_Argv;
-	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
-	ri.Con_Printf = VID_Printf;
-	ri.Sys_Error = VID_Error;
-	ri.FS_LoadFile = FS_LoadFile;
-	ri.FS_FreeFile = FS_FreeFile;
-	ri.FS_Gamedir = FS_Gamedir;
-	ri.Cvar_Get = Cvar_Get;
-	ri.Cvar_Set = Cvar_Set;
-	ri.Cvar_SetValue = Cvar_SetValue;
-	ri.Vid_GetModeInfo = VID_GetModeInfo;
-	ri.Vid_MenuInit = VID_MenuInit;
-	ri.Vid_NewWindow = VID_NewWindow;
+	//ri.Cmd_AddCommand = Cmd_AddCommand;
+	//ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
+	//ri.Cmd_Argc = Cmd_Argc;
+	//ri.Cmd_Argv = Cmd_Argv;
+	//ri.Cmd_ExecuteText = Cbuf_ExecuteText;
+	//ri.Con_Printf = VID_Printf;
+	//ri.Sys_Error = VID_Error;
+	//ri.FS_LoadFile = FS_LoadFile;
+	//ri.FS_FreeFile = FS_FreeFile;
+	//ri.FS_Gamedir = FS_Gamedir;
+	//ri.Cvar_Get = Cvar_Get;
+	//ri.Cvar_Set = Cvar_Set;
+	//ri.Cvar_SetValue = Cvar_SetValue;
+	//ri.Vid_GetModeInfo = VID_GetModeInfo;
+	//ri.Vid_MenuInit = VID_MenuInit;
+	//ri.Vid_NewWindow = VID_NewWindow;
 
-	if ( ( GetRefAPI = (void *) GetProcAddress( reflib_library, "GetRefAPI" ) ) == 0 )
-		Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
+	//if ( ( GetRefAPI = (void *) GetProcAddress( reflib_library, "GetRefAPI" ) ) == 0 )
+	//	Com_Error( ERR_FATAL, "GetProcAddress failed on %s", name );
 
-	re = GetRefAPI( ri );
+	//re = GetRefAPI( ri );
 
-	if (re.api_version != API_VERSION)
+	if (API_VERSION != API_VERSION)
 	{
 		VID_FreeReflib ();
 		Com_Error (ERR_FATAL, "%s has incompatible api_version", name);
 	}
 
-	if ( re.Init( global_hInstance, MainWndProc ) == -1 )
+	if ( R_Init( global_hInstance, MainWndProc ) == -1 )
 	{
-		re.Shutdown();
+		R_Shutdown();
 		VID_FreeReflib ();
 		return false;
 	}
@@ -753,7 +754,7 @@ void VID_Shutdown (void)
 {
 	if ( reflib_active )
 	{
-		re.Shutdown ();
+		R_Shutdown ();
 		VID_FreeReflib ();
 	}
 }

@@ -24,3 +24,9 @@ is based of another engine or engines, names will be credited!. If you
 want to use this code please credit!
 ===========================================================================
 */
+
+//
+// cl_oldParticles.c - old style particle management
+//
+
+#include "cl_oldParticles.h"

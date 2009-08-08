@@ -227,7 +227,7 @@ void GL_TextureMode( char *string )
 
 	if (i == NUM_GL_MODES)
 	{
-		ri.Con_Printf (PRINT_ALL, "bad filter name\n");
+		VID_Printf (PRINT_ALL, "bad filter name\n");
 		return;
 	}
 
@@ -263,7 +263,7 @@ void GL_TextureAlphaMode( char *string )
 
 	if (i == NUM_GL_ALPHA_MODES)
 	{
-		ri.Con_Printf (PRINT_ALL, "bad alpha texture mode name\n");
+		VID_Printf (PRINT_ALL, "bad alpha texture mode name\n");
 		return;
 	}
 
@@ -287,7 +287,7 @@ void GL_TextureSolidMode( char *string )
 
 	if (i == NUM_GL_SOLID_MODES)
 	{
-		ri.Con_Printf (PRINT_ALL, "bad solid texture mode name\n");
+		VID_Printf (PRINT_ALL, "bad solid texture mode name\n");
 		return;
 	}
 
@@ -310,7 +310,7 @@ void	GL_ImageList_f (void)
 		"PAL"
 	};
 
-	ri.Con_Printf (PRINT_ALL, "------------------\n");
+	VID_Printf (PRINT_ALL, "------------------\n");
 	texels = 0;
 
 	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
@@ -321,26 +321,26 @@ void	GL_ImageList_f (void)
 		switch (image->type)
 		{
 		case it_skin:
-			ri.Con_Printf (PRINT_ALL, "M");
+			VID_Printf (PRINT_ALL, "M");
 			break;
 		case it_sprite:
-			ri.Con_Printf (PRINT_ALL, "S");
+			VID_Printf (PRINT_ALL, "S");
 			break;
 		case it_wall:
-			ri.Con_Printf (PRINT_ALL, "W");
+			VID_Printf (PRINT_ALL, "W");
 			break;
 		case it_pic:
-			ri.Con_Printf (PRINT_ALL, "P");
+			VID_Printf (PRINT_ALL, "P");
 			break;
 		default:
-			ri.Con_Printf (PRINT_ALL, " ");
+			VID_Printf (PRINT_ALL, " ");
 			break;
 		}
 
-		ri.Con_Printf (PRINT_ALL,  " %3i %3i %s: %s\n",
+		VID_Printf (PRINT_ALL,  " %3i %3i %s: %s\n",
 			image->upload_width, image->upload_height, palstrings[image->paletted], image->name);
 	}
-	ri.Con_Printf (PRINT_ALL, "Total texel count (not counting mipmaps): %i\n", texels);
+	VID_Printf (PRINT_ALL, "Total texel count (not counting mipmaps): %i\n", texels);
 }
 
 
@@ -444,10 +444,10 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 	//
 	// load the file
 	//
-	len = ri.FS_LoadFile (filename, (void **)&raw);
+	len = FS_LoadFile (filename, (void **)&raw);
 	if (!raw)
 	{
-		ri.Con_Printf (PRINT_DEVELOPER, "Bad pcx file %s\n", filename);
+		VID_Printf (PRINT_DEVELOPER, "Bad pcx file %s\n", filename);
 		return;
 	}
 
@@ -474,7 +474,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 		|| pcx->xmax >= 640
 		|| pcx->ymax >= 480)
 	{
-		ri.Con_Printf (PRINT_ALL, "Bad pcx file %s\n", filename);
+		VID_Printf (PRINT_ALL, "Bad pcx file %s\n", filename);
 		return;
 	}
 
@@ -517,12 +517,12 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 
 	if ( raw - (byte *)pcx > len)
 	{
-		ri.Con_Printf (PRINT_DEVELOPER, "PCX file %s was malformed", filename);
+		VID_Printf (PRINT_DEVELOPER, "PCX file %s was malformed", filename);
 		free (*pic);
 		*pic = NULL;
 	}
 
-	ri.FS_FreeFile (pcx);
+	FS_FreeFile (pcx);
 }
 
 /*
@@ -564,10 +564,10 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	//
 	// load the file
 	//
-	length = ri.FS_LoadFile (name, (void **)&buffer);
+	length = FS_LoadFile (name, (void **)&buffer);
 	if (!buffer)
 	{
-		ri.Con_Printf (PRINT_DEVELOPER, "Bad tga file %s\n", name);
+		VID_Printf (PRINT_DEVELOPER, "Bad tga file %s\n", name);
 		return;
 	}
 
@@ -599,11 +599,11 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 
 	if (targa_header.image_type!=2 
 		&& targa_header.image_type!=10) 
-		ri.Sys_Error (ERR_DROP, "LoadTGA: Only type 2 and 10 targa RGB images supported\n");
+		VID_Error (ERR_DROP, "LoadTGA: Only type 2 and 10 targa RGB images supported\n");
 
 	if (targa_header.colormap_type !=0 
 		|| (targa_header.pixel_size!=32 && targa_header.pixel_size!=24))
-		ri.Sys_Error (ERR_DROP, "LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
+		VID_Error (ERR_DROP, "LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
 
 	columns = targa_header.width;
 	rows = targa_header.height;
@@ -728,7 +728,7 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 		}
 	}
 
-	ri.FS_FreeFile (buffer);
+	FS_FreeFile (buffer);
 }
 
 
@@ -1007,7 +1007,7 @@ qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 	upload_height = scaled_height;
 
 	if (scaled_width * scaled_height > sizeof(scaled)/4)
-		ri.Sys_Error (ERR_DROP, "GL_Upload32: too big");
+		VID_Error (ERR_DROP, "GL_Upload32: too big");
 
 	// scan the texture for any non-255 alpha
 	c = width*height;
@@ -1027,7 +1027,7 @@ qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 	else if (samples == gl_alpha_format)
 	    comp = gl_tex_alpha_format;
 	else {
-	    ri.Con_Printf (PRINT_ALL,
+	    VID_Printf (PRINT_ALL,
 			   "Unknown number of texture components %i\n",
 			   samples);
 	    comp = samples;
@@ -1182,7 +1182,7 @@ qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboole
 	s = width*height;
 
 	if (s > sizeof(trans)/4)
-		ri.Sys_Error (ERR_DROP, "GL_Upload8: too large");
+		VID_Error (ERR_DROP, "GL_Upload8: too large");
 
 	if ( qglColorTableEXT && 
 		 gl_ext_palettedtexture->value && 
@@ -1255,13 +1255,13 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	if (i == numgltextures)
 	{
 		if (numgltextures == MAX_GLTEXTURES)
-			ri.Sys_Error (ERR_DROP, "MAX_GLTEXTURES");
+			VID_Error (ERR_DROP, "MAX_GLTEXTURES");
 		numgltextures++;
 	}
 	image = &gltextures[i];
 
 	if (strlen(name) >= sizeof(image->name))
-		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
+		VID_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
 	strcpy (image->name, name);
 	image->registration_sequence = registration_sequence;
 
@@ -1332,10 +1332,10 @@ image_t *GL_LoadWal (char *name)
 	int			width, height, ofs;
 	image_t		*image;
 
-	ri.FS_LoadFile (name, (void **)&mt);
+	FS_LoadFile (name, (void **)&mt);
 	if (!mt)
 	{
-		ri.Con_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", name);
+		VID_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", name);
 		return r_notexture;
 	}
 
@@ -1345,7 +1345,7 @@ image_t *GL_LoadWal (char *name)
 
 	image = GL_LoadPic (name, (byte *)mt + ofs, width, height, it_wall, 8);
 
-	ri.FS_FreeFile ((void *)mt);
+	FS_FreeFile ((void *)mt);
 
 	return image;
 }
@@ -1477,7 +1477,7 @@ int Draw_GetPalette (void)
 
 	LoadPCX ("pics/colormap.pcx", &pic, &pal, &width, &height);
 	if (!pal)
-		ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx");
+		VID_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx");
 
 	for (i=0 ; i<256 ; i++)
 	{
@@ -1511,10 +1511,10 @@ void	GL_InitImages (void)
 	registration_sequence = 1;
 
 	// init intensity conversions
-	intensity = ri.Cvar_Get ("intensity", "2", 0);
+	intensity = Cvar_Get ("intensity", "2", 0);
 
 	if ( intensity->value <= 1 )
-		ri.Cvar_Set( "intensity", "1" );
+		Cvar_Set( "intensity", "1" );
 
 	gl_state.inverse_intensity = 1 / intensity->value;
 
@@ -1522,9 +1522,9 @@ void	GL_InitImages (void)
 
 	if ( qglColorTableEXT )
 	{
-		ri.FS_LoadFile( "pics/16to8.dat", &gl_state.d_16to8table );
+		FS_LoadFile( "pics/16to8.dat", &gl_state.d_16to8table );
 		if ( !gl_state.d_16to8table )
-			ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
+			VID_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
 	}
 
 	if ( gl_config.renderer & ( GL_RENDERER_VOODOO | GL_RENDERER_VOODOO2 ) )

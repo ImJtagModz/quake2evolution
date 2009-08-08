@@ -139,7 +139,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
-		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+		VID_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 		return;
 	}
 
@@ -178,7 +178,7 @@ void Draw_Pic (int x, int y, char *pic)
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
-		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+		VID_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 		return;
 	}
 	if (scrap_dirty)
@@ -218,7 +218,7 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 	image = Draw_FindPic (pic);
 	if (!image)
 	{
-		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+		VID_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 		return;
 	}
 
@@ -258,7 +258,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	} color;
 
 	if ( (unsigned)c > 255)
-		ri.Sys_Error (ERR_FATAL, "Draw_Fill: bad color");
+		VID_Error (ERR_FATAL, "Draw_Fill: bad color");
 
 	qglDisable (GL_TEXTURE_2D);
 

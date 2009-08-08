@@ -81,130 +81,10 @@ void CL_BFGExplosionParticles (vec3_t org);
 // RAFAEL
 void CL_BlueBlasterParticles (vec3_t org, vec3_t dir);
 
-struct sfx_s	*cl_sfx_ric1;
-struct sfx_s	*cl_sfx_ric2;
-struct sfx_s	*cl_sfx_ric3;
-struct sfx_s	*cl_sfx_lashit;
-struct sfx_s	*cl_sfx_spark5;
-struct sfx_s	*cl_sfx_spark6;
-struct sfx_s	*cl_sfx_spark7;
-struct sfx_s	*cl_sfx_railg;
-struct sfx_s	*cl_sfx_rockexp;
-struct sfx_s	*cl_sfx_grenexp;
-struct sfx_s	*cl_sfx_watrexp;
 // RAFAEL
-struct sfx_s	*cl_sfx_plasexp;
-struct sfx_s	*cl_sfx_footsteps[4];
 
-struct model_s	*cl_mod_explode;
-struct model_s	*cl_mod_smoke;
-struct model_s	*cl_mod_flash;
-struct model_s	*cl_mod_parasite_segment;
-struct model_s	*cl_mod_grapple_cable;
-struct model_s	*cl_mod_parasite_tip;
-struct model_s	*cl_mod_explo4;
-struct model_s	*cl_mod_bfg_explo;
-struct model_s	*cl_mod_powerscreen;
-// RAFAEL
-struct model_s	*cl_mod_plasmaexplo;
 
 //ROGUE
-struct sfx_s	*cl_sfx_lightning;
-struct sfx_s	*cl_sfx_disrexp;
-struct model_s	*cl_mod_lightning;
-struct model_s	*cl_mod_heatbeam;
-struct model_s	*cl_mod_monster_heatbeam;
-struct model_s	*cl_mod_explo4_big;
-
-//ROGUE
-/*
-=================
-CL_RegisterTEntSounds
-=================
-*/
-void CL_RegisterTEntSounds (void)
-{
-	int		i;
-	char	name[MAX_QPATH];
-
-	// PMM - version stuff
-//	Com_Printf ("%s\n", ROGUE_VERSION_STRING);
-	// PMM
-	cl_sfx_ric1 = S_RegisterSound ("world/ric1.wav");
-	cl_sfx_ric2 = S_RegisterSound ("world/ric2.wav");
-	cl_sfx_ric3 = S_RegisterSound ("world/ric3.wav");
-	cl_sfx_lashit = S_RegisterSound("weapons/lashit.wav");
-	cl_sfx_spark5 = S_RegisterSound ("world/spark5.wav");
-	cl_sfx_spark6 = S_RegisterSound ("world/spark6.wav");
-	cl_sfx_spark7 = S_RegisterSound ("world/spark7.wav");
-	cl_sfx_railg = S_RegisterSound ("weapons/railgf1a.wav");
-	cl_sfx_rockexp = S_RegisterSound ("weapons/rocklx1a.wav");
-	cl_sfx_grenexp = S_RegisterSound ("weapons/grenlx1a.wav");
-	cl_sfx_watrexp = S_RegisterSound ("weapons/xpld_wat.wav");
-	// RAFAEL
-	// cl_sfx_plasexp = S_RegisterSound ("weapons/plasexpl.wav");
-	S_RegisterSound ("player/land1.wav");
-
-	S_RegisterSound ("player/fall2.wav");
-	S_RegisterSound ("player/fall1.wav");
-
-	for (i=0 ; i<4 ; i++)
-	{
-		Com_sprintf (name, sizeof(name), "player/step%i.wav", i+1);
-		cl_sfx_footsteps[i] = S_RegisterSound (name);
-	}
-
-//PGM
-	cl_sfx_lightning = S_RegisterSound ("weapons/tesla.wav");
-	cl_sfx_disrexp = S_RegisterSound ("weapons/disrupthit.wav");
-	// version stuff
-//	sprintf (name, "weapons/sound%d.wav", ROGUE_VERSION_ID);
-//	if (name[0] == 'w')
-//		name[0] = 'W';
-//PGM
-}	
-
-/*
-=================
-CL_RegisterTEntModels
-=================
-*/
-void CL_RegisterTEntModels (void)
-{
-	cl_mod_explode = re.RegisterModel ("models/objects/explode/tris.md2");
-	cl_mod_smoke = re.RegisterModel ("models/objects/smoke/tris.md2");
-	cl_mod_flash = re.RegisterModel ("models/objects/flash/tris.md2");
-	cl_mod_parasite_segment = re.RegisterModel ("models/monsters/parasite/segment/tris.md2");
-	cl_mod_grapple_cable = re.RegisterModel ("models/ctf/segment/tris.md2");
-	cl_mod_parasite_tip = re.RegisterModel ("models/monsters/parasite/tip/tris.md2");
-	cl_mod_explo4 = re.RegisterModel ("models/objects/r_explode/tris.md2");
-	cl_mod_bfg_explo = re.RegisterModel ("sprites/s_bfg2.sp2");
-	cl_mod_powerscreen = re.RegisterModel ("models/items/armor/effect/tris.md2");
-
-re.RegisterModel ("models/objects/laser/tris.md2");
-re.RegisterModel ("models/objects/grenade2/tris.md2");
-re.RegisterModel ("models/weapons/v_machn/tris.md2");
-re.RegisterModel ("models/weapons/v_handgr/tris.md2");
-re.RegisterModel ("models/weapons/v_shotg2/tris.md2");
-re.RegisterModel ("models/objects/gibs/bone/tris.md2");
-re.RegisterModel ("models/objects/gibs/sm_meat/tris.md2");
-re.RegisterModel ("models/objects/gibs/bone2/tris.md2");
-// RAFAEL
-// re.RegisterModel ("models/objects/blaser/tris.md2");
-
-re.RegisterPic ("w_machinegun");
-re.RegisterPic ("a_bullets");
-re.RegisterPic ("i_health");
-re.RegisterPic ("a_grenades");
-
-//ROGUE
-	cl_mod_explo4_big = re.RegisterModel ("models/objects/r_explode2/tris.md2");
-	cl_mod_lightning = re.RegisterModel ("models/proj/lightning/tris.md2");
-	cl_mod_heatbeam = re.RegisterModel ("models/proj/beam/tris.md2");
-	cl_mod_monster_heatbeam = re.RegisterModel ("models/proj/widowbeam/tris.md2");
-//ROGUE
-}	
-
 /*
 =================
 CL_ClearTEnts
@@ -270,7 +150,7 @@ void CL_SmokeAndFlash(vec3_t origin)
 	ex->frames = 4;
 	ex->ent.flags = RF_TRANSLUCENT;
 	ex->start = cl.frame.servertime - 100;
-	ex->ent.model = cl_mod_smoke;
+	ex->ent.model = shMedia.cl_mod_smoke;
 
 	ex = CL_AllocExplosion ();
 	VectorCopy (origin, ex->ent.origin);
@@ -278,7 +158,7 @@ void CL_SmokeAndFlash(vec3_t origin)
 	ex->ent.flags = RF_FULLBRIGHT;
 	ex->frames = 2;
 	ex->start = cl.frame.servertime - 100;
-	ex->ent.model = cl_mod_flash;
+	ex->ent.model = shMedia.cl_mod_flash;
 }
 
 /*
@@ -420,11 +300,11 @@ int CL_ParsePlayerBeam (struct model_s *model)
 	MSG_ReadPos (&net_message, start);
 	MSG_ReadPos (&net_message, end);
 	// PMM - network optimization
-	if (model == cl_mod_heatbeam)
+	if (model == shMedia.cl_mod_monster_heatbeam)
 		VectorSet(offset, 2, 7, -3);
-	else if (model == cl_mod_monster_heatbeam)
+	else if (model == shMedia.cl_mod_monster_heatbeam)
 	{
-		model = cl_mod_heatbeam;
+		model = shMedia.cl_mod_monster_heatbeam;
 		VectorSet(offset, 0, 0, 0);
 	}
 	else
@@ -729,11 +609,11 @@ void CL_ParseTEnt (void)
 			// impact sound
 			cnt = rand()&15;
 			if (cnt == 1)
-				S_StartSound (pos, 0, 0, cl_sfx_ric1, 1, ATTN_NORM, 0);
+				S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_ricochet[0], 1, ATTN_NORM, 0);
 			else if (cnt == 2)
-				S_StartSound (pos, 0, 0, cl_sfx_ric2, 1, ATTN_NORM, 0);
+				S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_ricochet[1], 1, ATTN_NORM, 0);
 			else if (cnt == 3)
-				S_StartSound (pos, 0, 0, cl_sfx_ric3, 1, ATTN_NORM, 0);
+				S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_ricochet[2], 1, ATTN_NORM, 0);
 		}
 
 		break;
@@ -747,7 +627,7 @@ void CL_ParseTEnt (void)
 		else
 			CL_ParticleEffect (pos, dir, 0xb0, 40);
 		//FIXME : replace or remove this sound
-		S_StartSound (pos, 0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 		
 	case TE_SHOTGUN:			// bullet hitting wall
@@ -772,11 +652,11 @@ void CL_ParseTEnt (void)
 		{
 			r = rand() & 3;
 			if (r == 0)
-				S_StartSound (pos, 0, 0, cl_sfx_spark5, 1, ATTN_STATIC, 0);
+				S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_spark[0], 1, ATTN_STATIC, 0);
 			else if (r == 1)
-				S_StartSound (pos, 0, 0, cl_sfx_spark6, 1, ATTN_STATIC, 0);
+				S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_spark[1], 1, ATTN_STATIC, 0);
 			else
-				S_StartSound (pos, 0, 0, cl_sfx_spark7, 1, ATTN_STATIC, 0);
+				S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_spark[2], 1, ATTN_STATIC, 0);
 		}
 		break;
 
@@ -819,16 +699,16 @@ void CL_ParseTEnt (void)
 		ex->light = 150;
 		ex->lightcolor[0] = 1;
 		ex->lightcolor[1] = 1;
-		ex->ent.model = cl_mod_explode;
+		ex->ent.model = shMedia.cl_mod_explode;
 		ex->frames = 4;
-		S_StartSound (pos,  0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos,  0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 		
 	case TE_RAILTRAIL:			// railgun effect
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadPos (&net_message, pos2);
 		CL_RailTrail (pos, pos2);
-		S_StartSound (pos2, 0, 0, cl_sfx_railg, 1, ATTN_NORM, 0);
+		S_StartSound (pos2, 0, 0, shMedia.sfx.mz.cl_sfx_railgunFire, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_EXPLOSION2:
@@ -845,15 +725,15 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[0] = 1.0;
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
-		ex->ent.model = cl_mod_explo4;
+		ex->ent.model = shMedia.cl_mod_explo4;
 		ex->frames = 19;
 		ex->baseframe = 30;
 		ex->ent.angles[1] = rand() % 360;
 		CL_ExplosionParticles (pos);
 		if (type == TE_GRENADE_EXPLOSION_WATER)
-			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
+			S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_watrexp, 1, ATTN_NORM, 0);
 		else
-			S_StartSound (pos, 0, 0, cl_sfx_grenexp, 1, ATTN_NORM, 0);
+			S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_grenexp, 1, ATTN_NORM, 0);
 		break;
 
 	// RAFAEL
@@ -869,12 +749,12 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
 		ex->ent.angles[1] = rand() % 360;
-		ex->ent.model = cl_mod_explo4;
+		ex->ent.model = shMedia.cl_mod_explo4;
 		if (frand() < 0.5)
 			ex->baseframe = 15;
 		ex->frames = 15;
 		CL_ExplosionParticles (pos);
-		S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_rockexp, 1, ATTN_NORM, 0);
 		break;
 	
 	case TE_EXPLOSION1:
@@ -895,18 +775,18 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[2] = 0.5;
 		ex->ent.angles[1] = rand() % 360;
 		if (type != TE_EXPLOSION1_BIG)				// PMM
-			ex->ent.model = cl_mod_explo4;			// PMM
+			ex->ent.model = shMedia.cl_mod_explo4;			// PMM
 		else
-			ex->ent.model = cl_mod_explo4_big;
+			ex->ent.model = shMedia.cl_mod_explo4_big;
 		if (frand() < 0.5)
 			ex->baseframe = 15;
 		ex->frames = 15;
 		if ((type != TE_EXPLOSION1_BIG) && (type != TE_EXPLOSION1_NP))		// PMM
 			CL_ExplosionParticles (pos);									// PMM
 		if (type == TE_ROCKET_EXPLOSION_WATER)
-			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
+			S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_watrexp, 1, ATTN_NORM, 0);
 		else
-			S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
+			S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_rockexp, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_BFG_EXPLOSION:
@@ -920,7 +800,7 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[0] = 0.0;
 		ex->lightcolor[1] = 1.0;
 		ex->lightcolor[2] = 0.0;
-		ex->ent.model = cl_mod_bfg_explo;
+		ex->ent.model = shMedia.cl_mod_bfg_explo;
 		ex->ent.flags |= RF_TRANSLUCENT;
 		ex->ent.alpha = 0.30;
 		ex->frames = 4;
@@ -943,17 +823,17 @@ void CL_ParseTEnt (void)
 
 	case TE_PARASITE_ATTACK:
 	case TE_MEDIC_CABLE_ATTACK:
-		ent = CL_ParseBeam (cl_mod_parasite_segment);
+		ent = CL_ParseBeam (shMedia.cl_mod_parasite_segment);
 		break;
 
 	case TE_BOSSTPORT:			// boss teleporting to station
 		MSG_ReadPos (&net_message, pos);
 		CL_BigTeleportParticles (pos);
-		S_StartSound (pos, 0, 0, S_RegisterSound ("misc/bigtele.wav"), 1, ATTN_NONE, 0);
+		S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_bigTeleport, 1, ATTN_NONE, 0);
 		break;
 
 	case TE_GRAPPLE_CABLE:
-		ent = CL_ParseBeam2 (cl_mod_grapple_cable);
+		ent = CL_ParseBeam2 (shMedia.cl_mod_grapple_cable);
 		break;
 
 	// RAFAEL
@@ -975,7 +855,7 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[0] = 1.0;
 		ex->lightcolor[1] = 1.0;
 		ex->lightcolor[2] = 0.3;
-		ex->ent.model = cl_mod_flash;
+		ex->ent.model = shMedia.cl_mod_flash;
 		ex->frames = 2;
 		break;
 
@@ -1041,15 +921,15 @@ void CL_ParseTEnt (void)
 			ex->lightcolor[1] = 0.41;
 			ex->lightcolor[2] = 0.75;
 		}
-		ex->ent.model = cl_mod_explode;
+		ex->ent.model = shMedia.cl_mod_explode;
 		ex->frames = 4;
-		S_StartSound (pos,  0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos,  0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 
 
 	case TE_LIGHTNING:
-		ent = CL_ParseLightning (cl_mod_lightning);
-		S_StartSound (NULL, ent, CHAN_WEAPON, cl_sfx_lightning, 1, ATTN_NORM, 0);
+		ent = CL_ParseLightning (shMedia.cl_mod_lightning);
+		S_StartSound (NULL, ent, CHAN_WEAPON, shMedia.sfx.cl_sfx_lightning, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_DEBUGTRAIL:
@@ -1071,14 +951,14 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
 		ex->ent.angles[1] = rand() % 360;
-		ex->ent.model = cl_mod_explo4;
+		ex->ent.model = shMedia.cl_mod_explo4;
 		if (frand() < 0.5)
 			ex->baseframe = 15;
 		ex->frames = 15;
 		if (type == TE_ROCKET_EXPLOSION_WATER)
-			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
+			S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_watrexp, 1, ATTN_NORM, 0);
 		else
-			S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
+			S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_rockexp, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_FLASHLIGHT:
@@ -1095,11 +975,11 @@ void CL_ParseTEnt (void)
 		break;
 
 	case TE_HEATBEAM:
-		ent = CL_ParsePlayerBeam (cl_mod_heatbeam);
+		ent = CL_ParsePlayerBeam (shMedia.cl_mod_monster_heatbeam);
 		break;
 
 	case TE_MONSTER_HEATBEAM:
-		ent = CL_ParsePlayerBeam (cl_mod_monster_heatbeam);
+		ent = CL_ParsePlayerBeam (shMedia.cl_mod_monster_heatbeam);
 		break;
 
 	case TE_HEATBEAM_SPARKS:
@@ -1113,7 +993,7 @@ void CL_ParseTEnt (void)
 		magnitude = 60;
 		color = r & 0xff;
 		CL_ParticleSteamEffect (pos, dir, color, cnt, magnitude);
-		S_StartSound (pos,  0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos,  0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 	
 	case TE_HEATBEAM_STEAM:
@@ -1127,7 +1007,7 @@ void CL_ParseTEnt (void)
 		color = 0xe0;
 		magnitude = 60;
 		CL_ParticleSteamEffect (pos, dir, color, cnt, magnitude);
-		S_StartSound (pos,  0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos,  0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_STEAM:
@@ -1140,7 +1020,7 @@ void CL_ParseTEnt (void)
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadPos (&net_message, pos2);
 		CL_BubbleTrail2 (pos, pos2, cnt);
-		S_StartSound (pos,  0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos,  0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_MOREBLOOD:
@@ -1161,7 +1041,7 @@ void CL_ParseTEnt (void)
 //		CL_ParticleEffect (pos, dir, 109, 40);
 		CL_ParticleEffect (pos, dir, 0x75, 40);
 		//FIXME : replace or remove this sound
-		S_StartSound (pos, 0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_TRACKER_EXPLOSION:
@@ -1169,7 +1049,7 @@ void CL_ParseTEnt (void)
 		CL_ColorFlash (pos, 0, 150, -1, -1, -1);
 		CL_ColorExplosionParticles (pos, 0, 1);
 //		CL_Tracker_Explode (pos);
-		S_StartSound (pos, 0, 0, cl_sfx_disrexp, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, shMedia.sfx.cl_sfx_disrexp, 1, ATTN_NORM, 0);
 		break;
 
 	case TE_TELEPORT_EFFECT:
@@ -1262,7 +1142,7 @@ void CL_AddBeams (void)
 		d = VectorNormalize(dist);
 
 		memset (&ent, 0, sizeof(ent));
-		if (b->model == cl_mod_lightning)
+		if (b->model == shMedia.cl_mod_lightning)
 		{
 			model_length = 35.0;
 			d-= 20.0;  // correction so it doesn't end in middle of tesla
@@ -1277,7 +1157,7 @@ void CL_AddBeams (void)
 		// PMM - special case for lightning model .. if the real length is shorter than the model,
 		// flip it around & draw it from the end to the start.  This prevents the model from going
 		// through the tesla mine (instead it goes through the target)
-		if ((b->model == cl_mod_lightning) && (d <= model_length))
+		if ((b->model == shMedia.cl_mod_lightning) && (d <= model_length))
 		{
 //			Com_Printf ("special case\n");
 			VectorCopy (b->end, ent.origin);
@@ -1297,7 +1177,7 @@ void CL_AddBeams (void)
 		{
 			VectorCopy (org, ent.origin);
 			ent.model = b->model;
-			if (b->model == cl_mod_lightning)
+			if (b->model == shMedia.cl_mod_lightning)
 			{
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;
@@ -1383,7 +1263,7 @@ void CL_AddPlayerBeams (void)
 		if (!b->model || b->endtime < cl.time)
 			continue;
 
-		if(cl_mod_heatbeam && (b->model == cl_mod_heatbeam))
+		if(shMedia.cl_mod_monster_heatbeam && (b->model == shMedia.cl_mod_monster_heatbeam))
 		{
 
 			// if coming from the player, update the start position
@@ -1432,7 +1312,7 @@ void CL_AddPlayerBeams (void)
 		VectorSubtract (b->end, org, dist);
 
 //PMM
-		if(cl_mod_heatbeam && (b->model == cl_mod_heatbeam) && (b->entity == cl.playernum+1))
+		if(shMedia.cl_mod_monster_heatbeam && (b->model == shMedia.cl_mod_monster_heatbeam) && (b->entity == cl.playernum+1))
 		{
 			vec_t len;
 
@@ -1473,7 +1353,7 @@ void CL_AddPlayerBeams (void)
 				pitch += 360.0;
 		}
 		
-		if (cl_mod_heatbeam && (b->model == cl_mod_heatbeam))
+		if (shMedia.cl_mod_monster_heatbeam && (b->model == shMedia.cl_mod_monster_heatbeam))
 		{
 			if (b->entity != cl.playernum+1)
 			{
@@ -1505,7 +1385,7 @@ void CL_AddPlayerBeams (void)
 		}
 
 		// if it's the heatbeam, draw the particle effect
-		if ((cl_mod_heatbeam && (b->model == cl_mod_heatbeam) && (b->entity == cl.playernum+1)))
+		if ((shMedia.cl_mod_monster_heatbeam && (b->model == shMedia.cl_mod_monster_heatbeam) && (b->entity == cl.playernum+1)))
 		{
 			CL_Heatbeam (org, dist);
 		}
@@ -1514,11 +1394,11 @@ void CL_AddPlayerBeams (void)
 		d = VectorNormalize(dist);
 
 		memset (&ent, 0, sizeof(ent));
-		if (b->model == cl_mod_heatbeam)
+		if (b->model == shMedia.cl_mod_monster_heatbeam)
 		{
 			model_length = 32.0;
 		}
-		else if (b->model == cl_mod_lightning)
+		else if (b->model == shMedia.cl_mod_lightning)
 		{
 			model_length = 35.0;
 			d-= 20.0;  // correction so it doesn't end in middle of tesla
@@ -1533,7 +1413,7 @@ void CL_AddPlayerBeams (void)
 		// PMM - special case for lightning model .. if the real length is shorter than the model,
 		// flip it around & draw it from the end to the start.  This prevents the model from going
 		// through the tesla mine (instead it goes through the target)
-		if ((b->model == cl_mod_lightning) && (d <= model_length))
+		if ((b->model == shMedia.cl_mod_lightning) && (d <= model_length))
 		{
 //			Com_Printf ("special case\n");
 			VectorCopy (b->end, ent.origin);
@@ -1553,7 +1433,7 @@ void CL_AddPlayerBeams (void)
 		{
 			VectorCopy (org, ent.origin);
 			ent.model = b->model;
-			if(cl_mod_heatbeam && (b->model == cl_mod_heatbeam))
+			if(shMedia.cl_mod_monster_heatbeam && (b->model == shMedia.cl_mod_monster_heatbeam))
 			{
 //				ent.flags = RF_FULLBRIGHT|RF_TRANSLUCENT;
 //				ent.alpha = 0.3;
@@ -1564,7 +1444,7 @@ void CL_AddPlayerBeams (void)
 //				ent.angles[2] = rand()%360;
 				ent.frame = framenum;
 			}
-			else if (b->model == cl_mod_lightning)
+			else if (b->model == shMedia.cl_mod_lightning)
 			{
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;

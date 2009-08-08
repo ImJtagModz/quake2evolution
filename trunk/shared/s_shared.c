@@ -24,3 +24,11 @@ is based of another engine or engines, names will be credited!. If you
 want to use this code please credit!
 ===========================================================================
 */
+
+//
+// s_shared.c - included by shared.h
+//
+
+#include "../shared/shared.h"
+
+shMedia_t	shMedia;

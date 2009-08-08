@@ -24,3 +24,21 @@ is based of another engine or engines, names will be credited!. If you
 want to use this code please credit!
 ===========================================================================
 */
+
+//
+// s_shared.h - this includes all shared .h files and gets included in shared.h
+//
+
+/*
+=============================================================================
+
+	HEADER INCLUDES
+
+=============================================================================
+*/
+
+// ===========================================================================
+// Media system
+
+#include "../shared/media/s_media.h"
+

@@ -1,6 +1,21 @@
+Started on this engine: Sunday 7th august 2008
+
+SVN
+I did a overall clean up in this source such as rename some quake2
+------------------------------------------------------------------
+
+
+ 
+- Add new evolution icon to the page
+
+Engine
 - Clean and setup project files
   * Add over gl_ref files *DONE*
-  * Remove the wierd linked stuff (ri.)
+  * Remove the wierd linked stuff (ri.) *DONE*
   * Remove software and replace with openGL
-- Start on the shared 'shared' system, add a new share file and include it in q_shared.h
+    * Remove software within the openGL files and replace with openGL only
 - The first 'feature' is going to be a new particle system but keep the old style system
+- Clean up media stuff and rewrite it in s_media
+  * Models 
+  * Sounds
+  * Pics

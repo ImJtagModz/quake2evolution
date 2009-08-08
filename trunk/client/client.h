@@ -450,7 +450,7 @@ void CL_ParseLayout (void);
 //
 // cl_main
 //
-extern	refexport_t	re;		// interface to refresh .dll
+//extern	refexport_t	re;		// interface to refresh .dll
 
 void CL_Init (void);
 
@@ -528,8 +528,6 @@ void V_AddLightStyle (int style, float r, float g, float b);
 //
 // cl_tent.c
 //
-void CL_RegisterTEntSounds (void);
-void CL_RegisterTEntModels (void);
 void CL_SmokeAndFlash(vec3_t origin);
 
 
@@ -582,3 +580,26 @@ void x86_TimerStop( void );
 void x86_TimerInit( unsigned long smallest, unsigned longest );
 unsigned long *x86_TimerGetHistogram( void );
 #endif
+
+// Buzzard - i proto them here for now
+void R_Shutdown (void);
+int R_Init( void *hinstance, void *hWnd );
+void GLimp_AppActivate( qboolean active );
+void R_SetSky (char *name, float rotate, vec3_t axis);
+void R_SetPalette ( const unsigned char *palette);
+void R_RenderFrame (refdef_t *fd);
+struct image_s *R_RegisterSkin (char *name);
+struct model_s *R_RegisterModel (char *name);
+void R_EndRegistration (void);
+void R_BeginRegistration (char *model);
+void R_BeginFrame( float camera_separation );
+void GLimp_EndFrame (void);
+void Draw_TileClear (int x, int y, int w, int h, char *pic);
+void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data);
+void Draw_StretchPic (int x, int y, int w, int h, char *pic);
+void Draw_Pic (int x, int y, char *pic);
+void Draw_GetPicSize (int *w, int *h, char *pic);
+struct image_t	*Draw_FindPic (char *name);
+void Draw_Fill (int x, int y, int w, int h, int c);
+void Draw_FadeScreen (void);
+void Draw_Char (int x, int y, int num);

@@ -24,3 +24,39 @@ is based of another engine or engines, names will be credited!. If you
 want to use this code please credit!
 ===========================================================================
 */
+
+//
+// s_mathlib.c - math library main file
+//
+
+#include "../s_local.h"
+
+/*
+=============================================================================
+
+	MATH LIBRARY
+
+=============================================================================
+*/
+
+/*
+===============
+Q_FastSqrt
+
+5% margin of error
+===============
+*/
+#ifdef id386
+float Q_FastSqrt(float value)
+{
+	float result;
+	__asm {
+		mov eax, value
+		sub eax, 0x3f800000
+		sar eax, 1
+		add eax, 0x3f800000
+		mov result, eax
+	}
+	return result;
+}
+#endif // id386

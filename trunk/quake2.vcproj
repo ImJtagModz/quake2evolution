@@ -1567,19 +1567,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\renderer\r_local.h"
-				>
-			</File>
-			<File
 				RelativePath=".\renderer\r_mesh.c"
 				>
 			</File>
 			<File
 				RelativePath=".\renderer\r_model.c"
-				>
-			</File>
-			<File
-				RelativePath=".\renderer\r_model.h"
 				>
 			</File>
 			<File
@@ -2212,14 +2204,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ref_gl\gl_local.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ref_gl\gl_model.h"
-				>
-			</File>
-			<File
 				RelativePath=".\win32\glw_win.h"
 				>
 			</File>
@@ -2252,11 +2236,15 @@
 				>
 			</File>
 			<File
-				RelativePath="client\ref.h"
+				RelativePath=".\renderer\r_local.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ref_gl\ref_gl.h"
+				RelativePath=".\renderer\r_model.h"
+				>
+			</File>
+			<File
+				RelativePath="client\ref.h"
 				>
 			</File>
 			<File
@@ -2351,6 +2339,14 @@
 					Name="Particles"
 					>
 					<File
+						RelativePath=".\client\particles\cl_oldParticles.c"
+						>
+					</File>
+					<File
+						RelativePath=".\client\particles\cl_oldParticles.h"
+						>
+					</File>
+					<File
 						RelativePath=".\client\particles\cl_particles.c"
 						>
 					</File>
@@ -2359,10 +2355,70 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="MuzzleFlash"
+					>
+					<File
+						RelativePath=".\client\muzzleflash\cl_muzzleflash.c"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Shared"
 				>
+				<File
+					RelativePath=".\shared\s_local.h"
+					>
+				</File>
+				<File
+					RelativePath=".\shared\s_shared.c"
+					>
+				</File>
+				<File
+					RelativePath=".\shared\s_shared.h"
+					>
+				</File>
+				<File
+					RelativePath=".\shared\shared.h"
+					>
+				</File>
+				<Filter
+					Name="MathLib"
+					>
+					<File
+						RelativePath=".\shared\mathlib\s_mathlib.c"
+						>
+					</File>
+					<File
+						RelativePath=".\shared\mathlib\s_mathlib.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Register"
+					>
+					<File
+						RelativePath=".\shared\register\s_register.c"
+						>
+					</File>
+					<File
+						RelativePath=".\shared\register\s_register.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Media"
+					>
+					<File
+						RelativePath=".\shared\media\s_media.c"
+						>
+					</File>
+					<File
+						RelativePath=".\shared\media\s_media.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>

@@ -436,7 +436,7 @@ IMPORTED FUNCTIONS
 ====================================================================
 */
 
-extern	refimport_t	ri;
+//extern	refimport_t	ri;
 
 
 /*
@@ -456,3 +456,8 @@ void		GLimp_AppActivate( qboolean active );
 void		GLimp_EnableLogging( qboolean enable );
 void		GLimp_LogNewFrame( void );
 
+// Buzzard - i proto them here for now
+void VID_MenuInit( void );
+void VID_Error (int err_level, char *fmt, ...);
+qboolean VID_GetModeInfo( int *width, int *height, int mode );
+void VID_Printf (int print_level, char *fmt, ...);
