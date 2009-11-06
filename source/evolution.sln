@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcproj", "{DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "evolution", "evolution.vcproj", "{B057967C-5CCB-4852-8B64-84137C53B8F5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9} = {DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9}.Debug|Win32.Build.0 = Debug|Win32
+		{DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9}.Release|Win32.ActiveCfg = Release|Win32
+		{DCAF4F8A-4135-4BD0-8B3A-79F6B06CF1C9}.Release|Win32.Build.0 = Release|Win32
+		{B057967C-5CCB-4852-8B64-84137C53B8F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B057967C-5CCB-4852-8B64-84137C53B8F5}.Debug|Win32.Build.0 = Debug|Win32
+		{B057967C-5CCB-4852-8B64-84137C53B8F5}.Release|Win32.ActiveCfg = Release|Win32
+		{B057967C-5CCB-4852-8B64-84137C53B8F5}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
