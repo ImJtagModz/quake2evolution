@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcproj", "{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "evolution", "quake2.vcproj", "{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B} = {502094F0-C0EC-48A6-8C2E-5E29B4886A4B}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Alpha|Win32 = Debug Alpha|Win32
+		Debug|Win32 = Debug|Win32
+		Release Alpha|Win32 = Release Alpha|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Debug Alpha|Win32.ActiveCfg = Debug Alpha|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Debug Alpha|Win32.Build.0 = Debug Alpha|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Debug|Win32.Build.0 = Debug|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Release Alpha|Win32.ActiveCfg = Release Alpha|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Release Alpha|Win32.Build.0 = Release Alpha|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Release|Win32.ActiveCfg = Release|Win32
+		{502094F0-C0EC-48A6-8C2E-5E29B4886A4B}.Release|Win32.Build.0 = Release|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Debug Alpha|Win32.ActiveCfg = Debug Alpha|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Debug Alpha|Win32.Build.0 = Debug Alpha|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Debug|Win32.Build.0 = Debug|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Release Alpha|Win32.ActiveCfg = Release Alpha|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Release Alpha|Win32.Build.0 = Release Alpha|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Release|Win32.ActiveCfg = Release|Win32
+		{68E75E54-EE9C-4C59-AC60-E498E9DBB0A4}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
