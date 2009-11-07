@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 
-#ifndef __SURFACEFLAGS_H__
-#define __SURFACEFLAGS_H__
+#ifndef __S_SURFACEFLAGS_H__
+#define __S_SURFACEFLAGS_H__
 
 
 // Contents flags are separate bits.
@@ -68,4 +68,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	SURF_NODRAW				0x00000080	// Don't bother referencing the texture
 
 
-#endif	// __SURFACEFLAGS_H__
+#endif	// __S_SURFACEFLAGS_H__

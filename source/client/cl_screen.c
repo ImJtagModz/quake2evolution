@@ -908,7 +908,7 @@ static void CL_DrawLayoutField (int x, int y, int color, int width, int value){
 		else
 			frame = *ptr - '0';
 
-		CL_DrawPicFixed(x, y, cl.media.hudNumberShaders[color][frame]);
+		CL_DrawPicFixed(x, y, clMedia.hudNumMaterials[color][frame]);
 
 		x += CHAR_WIDTH;
 		ptr++;
@@ -1050,11 +1050,11 @@ static void CL_ExecuteLayoutString (char *string){
 			if (index < 0 || index >= MAX_IMAGES)
 				Com_Error(ERR_DROP, "CL_ExecuteLayoutString: bad pic index %i", index);
 
-			if (!cl.media.gameShaders[index])
+			if (!clMedia.gameMaterials[index])
 				continue;
 
 			if (cl_drawIcons->integer)
-				CL_DrawPicFixed(x, y, cl.media.gameShaders[index]);
+				CL_DrawPicFixed(x, y, clMedia.gameMaterials[index]);
 
 			continue;
 		}
@@ -1527,7 +1527,7 @@ static void CL_DrawCrosshair (void){
 	}
 
 	// Draw it
-	R_DrawStretchPic(x, y, w, h, 0, 0, 1, 1, color, cl.media.crosshairShaders[crosshair]);
+	R_DrawStretchPic(x, y, w, h, 0, 0, 1, 1, color, clMedia.crosshairMaterial[crosshair]);
 
 	// Draw target name
 	if (cl_crosshairNames->integer){
@@ -1594,7 +1594,7 @@ static void CL_DrawLagometer (void){
 	if (Com_ServerState())
 		return;
 
-	CL_DrawPic(592, 432, 48, 48, colorWhite, cl.media.lagometerShader);
+	CL_DrawPic(592, 432, 48, 48, colorWhite, clMedia.lagometerMaterial);
 
 	x = 592;
 	y = 432;
@@ -1658,7 +1658,7 @@ static void CL_DrawDisconnected (void){
 	if ((cl.time >> 9) & 1)
 		return;
 
-	CL_DrawPic(592, 432, 48, 48, colorWhite, cl.media.disconnectedShader);
+	CL_DrawPic(592, 432, 48, 48, colorWhite, clMedia.disconnectedMaterial);
 }
 
 /*
@@ -1726,7 +1726,7 @@ static void CL_DrawPause (void){
 	if (!paused->integer || UI_IsVisible())
 		return;
 
-	CL_DrawPic(0, 220, 640, 40, colorWhite, cl.media.pauseShader);
+	CL_DrawPic(0, 220, 640, 40, colorWhite, clMedia.pauseMaterial);
 }
 
 /*
@@ -1884,7 +1884,7 @@ static void CL_TileClearBox (int x, int y, int w, int h){
 	sh = (x+w) / 64.0;
 	th = (y+h) / 64.0;
 
-	R_DrawStretchPic(x, y, w, h, sl, tl, sh, th, colorWhite, cl.media.backTileShader);
+	R_DrawStretchPic(x, y, w, h, sl, tl, sh, th, colorWhite, clMedia.backTileMaterial);
 }
 
 /*

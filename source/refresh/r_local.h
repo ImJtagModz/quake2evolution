@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 
-// This is defined in q_shared.h
+// This is defined in s_shared.h
 #undef MAX_MODELS
 
 
@@ -1072,7 +1072,7 @@ extern cvar_t	*r_shadows;
 extern cvar_t	*r_caustics;
 extern cvar_t	*r_lodBias;
 extern cvar_t	*r_lodDistance;
-extern cvar_t	*r_dynamicLights;
+extern cvar_t	*gl_dynamic;
 extern cvar_t	*gl_modulate;
 extern cvar_t	*r_ambientScale;
 extern cvar_t	*r_directedScale;

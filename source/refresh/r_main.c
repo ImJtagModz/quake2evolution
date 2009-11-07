@@ -151,7 +151,7 @@ cvar_t	*r_shadows;
 cvar_t	*r_caustics;
 cvar_t	*r_lodBias;
 cvar_t	*r_lodDistance;
-cvar_t	*r_dynamicLights;
+cvar_t	*gl_dynamic;
 cvar_t	*gl_modulate;
 cvar_t	*r_ambientScale;
 cvar_t	*r_directedScale;
@@ -1643,7 +1643,7 @@ static void R_Register (void){
 	r_caustics = Cvar_Get("r_caustics", "0", CVAR_ARCHIVE);
 	r_lodBias = Cvar_Get("r_lodBias", "0", CVAR_ARCHIVE);
 	r_lodDistance = Cvar_Get("r_lodDistance", "250.0", CVAR_ARCHIVE);
-	r_dynamicLights = Cvar_Get("r_dynamicLights", "1", CVAR_ARCHIVE);
+	gl_dynamic = Cvar_Get("gl_dynamic", "1", CVAR_ARCHIVE);
 	gl_modulate = Cvar_Get("gl_modulate", "1.0", CVAR_ARCHIVE | CVAR_LATCH);
 	r_ambientScale = Cvar_Get("r_ambientScale", "0.6", CVAR_ARCHIVE);
 	r_directedScale = Cvar_Get("r_directedScale", "1.0", CVAR_ARCHIVE);

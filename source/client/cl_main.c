@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 clientState_t	cl;
 clientStatic_t	cls;
+clMedia_t	    clMedia;
 
 cvar_t	*cl_hand;
 cvar_t	*cl_zoomFov;
@@ -58,6 +59,7 @@ cvar_t	*cl_thirdPersonRange;
 cvar_t	*cl_thirdPersonAngle;
 cvar_t	*cl_viewBlend;
 cvar_t	*cl_particles;
+cvar_t	*cl_particleMax;
 cvar_t	*cl_particleLOD;
 cvar_t	*cl_particleBounce;
 cvar_t	*cl_particleFriction;
@@ -1457,6 +1459,7 @@ static void CL_InitLocal (void){
 	cl_thirdPersonAngle = Cvar_Get("cl_thirdPersonAngle", "0", CVAR_CHEAT);
 	cl_viewBlend = Cvar_Get("cl_viewBlend", "1", CVAR_ARCHIVE);
 	cl_particles = Cvar_Get("cl_particles", "1", CVAR_ARCHIVE);
+	cl_particleMax = Cvar_Get("cl_particleMax", "1", CVAR_ARCHIVE);
 	cl_particleLOD = Cvar_Get("cl_particleLOD", "0", CVAR_ARCHIVE);
 	cl_particleBounce = Cvar_Get("cl_particleBounce", "1", CVAR_ARCHIVE);
 	cl_particleFriction = Cvar_Get("cl_particleFriction", "1", CVAR_ARCHIVE);

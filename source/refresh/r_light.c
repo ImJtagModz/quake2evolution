@@ -95,7 +95,7 @@ void R_MarkLights (void){
 	dlight_t	*dl;
 	int			l;
 
-	if (!r_dynamicLights->integer || !r_numDLights)
+	if (!gl_dynamic->integer || !r_numDLights)
 		return;
 
 	r_stats.numDLights += r_numDLights;
@@ -238,7 +238,7 @@ void R_LightForPoint (const vec3_t point, vec3_t ambientLight){
 	VectorCopy(r_pointColor, ambientLight);
 
 	// Add dynamic lights
-	if (r_dynamicLights->integer){
+	if (gl_dynamic->integer){
 		for (l = 0, dl = r_dlights; l < r_numDLights; l++, dl++){
 			VectorSubtract(dl->origin, point, dir);
 			dist = VectorLength(dir);
@@ -320,7 +320,7 @@ void R_LightDir (const vec3_t origin, vec3_t lightDir){
 	R_ReadLightGrid(origin, lightDir);
 
 	// Add dynamic lights
-	if (r_dynamicLights->integer){
+	if (gl_dynamic->integer){
 		for (l = 0, dl = r_dlights; l < r_numDLights; l++, dl++){
 			VectorSubtract(dl->origin, origin, dir);
 			dist = VectorLength(dir);
@@ -378,7 +378,7 @@ void R_LightingAmbient (void){
 	}
 
 	// Add dynamic lights
-	if (r_dynamicLights->integer){
+	if (gl_dynamic->integer){
 		if (rb_entity->entityType == ET_MODEL)
 			radius = rb_entity->model->radius;
 		else
@@ -464,7 +464,7 @@ void R_LightingDiffuse (void){
 	}
 
 	// Add dynamic lights
-	if (r_dynamicLights->integer){
+	if (gl_dynamic->integer){
 		if (rb_entity->entityType == ET_MODEL)
 			radius = rb_entity->model->radius;
 		else

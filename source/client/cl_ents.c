@@ -457,29 +457,28 @@ static void CL_FireEntityEvents (void){
 		case EV_ITEM_RESPAWN:
 			S_StartSound(NULL, state->number, CHAN_WEAPON, S_RegisterSound("items/respawn1.wav"), 1, ATTN_IDLE, 0);
 			CL_ItemRespawnParticles(state->origin);
-
 			break;
+
 		case EV_PLAYER_TELEPORT:
-			S_StartSound(NULL, state->number, CHAN_WEAPON, S_RegisterSound("misc/tele1.wav"), 1, ATTN_IDLE, 0);
+			S_StartSound(NULL, state->number, CHAN_WEAPON, clMedia.sfx.playerTeleport, 1, ATTN_IDLE, 0);
 			CL_TeleportParticles(state->origin);
-
 			break;
+
 		case EV_FOOTSTEP:
 			if (cl_footSteps->integer)
-				S_StartSound(NULL, state->number, CHAN_BODY, cl.media.sfxFootSteps[rand()&3], 1, ATTN_NORM, 0);
-
+				S_StartSound(NULL, state->number, CHAN_BODY, clMedia.sfx.steps.standard[rand()&3], 1, ATTN_NORM, 0);
 			break;
+
 		case EV_FALLSHORT:
-			S_StartSound(NULL, state->number, CHAN_AUTO, S_RegisterSound("player/land1.wav"), 1, ATTN_NORM, 0);
-
+			S_StartSound(NULL, state->number, CHAN_AUTO, clMedia.sfx.playerFallShort, 1, ATTN_NORM, 0);
 			break;
+
 		case EV_FALL:
-			S_StartSound(NULL, state->number, CHAN_AUTO, S_RegisterSound("*fall2.wav"), 1, ATTN_NORM, 0);
-
+			S_StartSound(NULL, state->number, CHAN_AUTO, clMedia.sfx.playerFall, 1, ATTN_NORM, 0);
 			break;
-		case EV_FALLFAR:
-			S_StartSound(NULL, state->number, CHAN_AUTO, S_RegisterSound("*fall1.wav"), 1, ATTN_NORM, 0);
 
+		case EV_FALLFAR:
+			S_StartSound(NULL, state->number, CHAN_AUTO, clMedia.sfx.playerFallFar, 1, ATTN_NORM, 0);
 			break;
 		}
 	}
@@ -955,7 +954,7 @@ void CL_AddPacketEntities (void){
 		}
 		else {
 			ent.skinNum = state->skinnum;
-			ent.model = cl.media.gameModels[state->modelindex];
+			ent.model = clMedia.gameModels[state->modelindex];
 			ent.customShader = NULL;
 		}
 
@@ -1023,7 +1022,7 @@ void CL_AddPacketEntities (void){
 					ent.model = ci->weaponModel[0];
 			}
 			else {
-				ent.model = cl.media.gameModels[state->modelindex2];
+				ent.model = clMedia.gameModels[state->modelindex2];
 
 				// HACK: check for the defender sphere shell. Make it
 				// translucent.
@@ -1042,7 +1041,7 @@ void CL_AddPacketEntities (void){
 		}
         if (state->modelindex3)
 		{
-			ent.model = cl.media.gameModels[state->modelindex3];
+			ent.model = clMedia.gameModels[state->modelindex3];
             R_AddEntityToScene(&ent);
 
 			// Color shells generate a separate entity for the main model
@@ -1051,7 +1050,7 @@ void CL_AddPacketEntities (void){
 		}
         if (state->modelindex4)
 		{
-			ent.model = cl.media.gameModels[state->modelindex4];
+			ent.model = clMedia.gameModels[state->modelindex4];
             R_AddEntityToScene(&ent);
 
 			// Color shells generate a separate entity for the main model
@@ -1062,7 +1061,7 @@ void CL_AddPacketEntities (void){
 		// Power screen
         if (state->effects & EF_POWERSCREEN)
 		{
-			ent.model = cl.media.modPowerScreenShell;
+			ent.model = clMedia.powerScreenModel;
             ent.frame = 0;
             ent.oldFrame = 0;
 			ent.customShader = cl.media.powerScreenShellShader;
@@ -1107,14 +1106,14 @@ void CL_AddViewWeapon (void){
 	if (cl.testGun)
 		return;
 
-    if (!cl.media.gameModels[cl.playerState->gunindex])
+    if (!clMedia.gameModels[cl.playerState->gunindex])
         return;
 
 	memset(&gun, 0, sizeof(gun));
 
 	gun.entityType = ET_MODEL;
 	gun.renderFX = RF_MINLIGHT | RF_DEPTHHACK | RF_WEAPONMODEL;
-	gun.model = cl.media.gameModels[cl.playerState->gunindex];
+	gun.model = clMedia.gameModels[cl.playerState->gunindex];
 	gun.backLerp = 1.0 - cl.lerpFrac;
 	gun.ammoValue = cl.playerState->stats[STAT_AMMO];
 	MakeRGBA(gun.shaderRGBA, 255, 255, 255, 255);
@@ -1153,11 +1152,11 @@ void CL_AddViewWeapon (void){
 
 		gun.renderFX |= state->renderfx;
 
-		if (state->effects & EF_COLOR_SHELL){
-			// Remove godmode for weapon
+		// Add shell to view weapon
+		if (state->effects & EF_COLOR_SHELL)
+		{
 			if ((gun.renderFX & RF_SHELL_RED) && (gun.renderFX & RF_SHELL_GREEN) && (gun.renderFX & RF_SHELL_BLUE)){
 				CL_AddShellEntity(&gun, (state->effects & ~EF_COLOR_SHELL), true);
-				return;
 			}
 		}
 
@@ -1207,7 +1206,7 @@ void CL_GetEntitySoundSpatialization (int ent, vec3_t origin, vec3_t velocity){
 
 	// If a brush model, offset the origin
 	if (cent->current.solid == 31){
-		cmodel = cl.media.gameCModels[cent->current.modelindex];
+		cmodel = clMedia.gameCModels[cent->current.modelindex];
 		if (!cmodel)
 			return;
 
