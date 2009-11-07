@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __QCOMMON_H__
 
 
-#include "../qshared/q_shared.h"
+#include "../shared/s_shared.h"
 #include "../qcommon/qfiles.h"
 
 

@@ -124,7 +124,7 @@ static void UI_Performance_GetConfig (void){
 	if (Cvar_VariableInteger("r_inGameVideo"))
 		uiPerformance.inGameVideo.curValue = 1;
 
-	if (Cvar_VariableInteger("r_dynamicLights"))
+	if (Cvar_VariableInteger("gl_dynamic"))
 		uiPerformance.dynamicLights.curValue = 1;
 
 	uiPerformance.shadows.curValue = Cvar_VariableInteger("r_shadows");
@@ -189,7 +189,7 @@ static void UI_Performance_SetConfig (void){
 
 	Cvar_SetInteger("r_inGameVideo", (int)uiPerformance.inGameVideo.curValue);
 
-	Cvar_SetInteger("r_dynamicLights", (int)uiPerformance.dynamicLights.curValue);
+	Cvar_SetInteger("gl_dynamic", (int)uiPerformance.dynamicLights.curValue);
 
 	Cvar_SetInteger("r_shadows", (int)uiPerformance.shadows.curValue);
 

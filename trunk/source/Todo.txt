@@ -1,12 +1,17 @@
 Client
-* Add EGL math
 * Replace all media with my own (textures, materials etc.) and clean it up
-  - This needs some editing for the particle textures path of the material function (look at egl)
+  - This needs some editing for the particle textures path of the material function (look at egl) or not
+  - Finish replace all muzzle flash with new structer
 * Clean up register
 * Start rewrite the particle system
-  - Start with the allocating
+  - Start with the allocating 
+    - This got problems with cl_particleMax
+    - So move over to CL_AddParticle
+      - Move alpha to color vec4_t
+      - Add thinking functions
 * Change icon
 * Fix brass origin with q2xp in muzzle flash code
+* Add shadows from the player model
 
 Bugs
 * Find out why it never really connects to online servers like vortex;
@@ -15,12 +20,7 @@ you have to force it to connect
   - This has to do with ent.flags and RF_ / EF_ flags in CL_AddPacketEntities 
 
 Done
-* Changed r_modulate to gl_modulate to make the servers happy.
-* Changed material path and name to materials\.mtr.
-* Added item bobing with cvar 'cl_itemBob'.
-  - :: 1 by default
-* Started setting up the media system.
-  
+
   
 New in 0.2.0
 * Material script system
@@ -35,6 +35,7 @@ New in 0.2.0
 * New shell, brass (bullet, shell), powershield effects
 * Better lighting on models; calculating on every vertex
 * True 3D sound engine running through openAL, also uses some EAX extensions
+* OGG Vorbis music playback
 
   
   

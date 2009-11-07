@@ -1178,24 +1178,8 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\qshared\q_shared.c"
+				RelativePath="..\shared\s_shared.c"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -1299,7 +1283,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\qshared\q_shared.h"
+				RelativePath="..\shared\s_shared.h"
 				>
 			</File>
 		</Filter>

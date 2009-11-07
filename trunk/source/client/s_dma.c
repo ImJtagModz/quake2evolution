@@ -309,7 +309,7 @@ static void S_AddLoopingSounds (void){
 		if (!ent->sound)
 			continue;
 
-		sfx = cl.media.gameSounds[ent->sound];
+		sfx = clMedia.gameSounds[ent->sound];
 		if (!sfx || !sfx->loaded)
 			continue;		// Bad sound effect
 

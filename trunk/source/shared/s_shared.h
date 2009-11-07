@@ -19,11 +19,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 	
 
-// q_shared.h -- included first by ALL program modules
+// s_shared.h -- included first by ALL program modules
 
 
-#ifndef __Q_SHARED_H__
-#define __Q_SHARED_H__
+#ifndef __S_SHARED_H__
+#define __S_SHARED_H__
 
 
 #ifdef _WIN32
@@ -50,6 +50,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
+
+#include "s_mathlib.h"
 
 
 // This is the define for determining if we have an ASM version of a C
@@ -485,7 +487,7 @@ void		Info_Print (char *string);
 
 // =====================================================================
 
-// This is only here so the functions in q_shared.c can link
+// This is only here so the functions in s_shared.c can link
 void		Com_Error (int code, const char *fmt, ...);
 void		Com_Printf (const char *fmt, ...);
 
@@ -545,7 +547,7 @@ typedef struct gamecvar_s {
  =======================================================================
 */
 
-#include "surfaceflags.h"
+#include "s_surfaceflags.h"
 
 // Content masks
 #define	MASK_ALL				(-1)
@@ -1235,4 +1237,4 @@ typedef struct {
 } player_state_t;
 
 
-#endif	// __Q_SHARED_H__
+#endif	// __S_SHARED_H__

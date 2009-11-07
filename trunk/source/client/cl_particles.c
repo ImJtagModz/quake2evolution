@@ -1,5 +1,7 @@
 /*
+===========================================================================
 Copyright (C) 1997-2001 Id Software, Inc.
+Copyright (C) 2009-2010 Quake 2 Evolution.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -15,9 +17,12 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
+===========================================================================
 */
 
+//
+// cl_particles.c
+//
 
 #include "cl_local.h"
 
@@ -60,31 +65,20 @@ static cparticle_t	cl_particleList[MAX_PARTICLES];
 static vec3_t		cl_particleVelocities[NUM_VERTEX_NORMALS];
 static vec3_t		cl_particlePalette[256];
 
-
 /*
- =================
- CL_FreeParticle
- =================
-*/
-static void CL_FreeParticle (cparticle_t *p){
-
-	p->next = cl_freeParticles;
-	cl_freeParticles = p;
-}
-
-/*
- =================
+ ==================
  CL_AllocParticle
- =================
+ ==================
 */
-static cparticle_t *CL_AllocParticle (void){
-
+static cparticle_t *CL_AllocParticle ()
+{
 	cparticle_t	*p;
 
 	if (!cl_freeParticles)
 		return NULL;
 
-	if (cl_particleLOD->integer > 1){
+	if (cl_particleLOD->integer > 1)
+	{
 		if (!(rand() % cl_particleLOD->integer))
 			return NULL;
 	}
@@ -98,12 +92,88 @@ static cparticle_t *CL_AllocParticle (void){
 }
 
 /*
- =================
- CL_ClearParticles
- =================
+ ==================
+ CL_FreeParticle
+ ==================
 */
-void CL_ClearParticles (void){
+static void CL_FreeParticle (cparticle_t *p)
+{
+	p->next = cl_freeParticles;
+	cl_freeParticles = p;
+}
 
+/*
+ ==================
+ CL_SpawnParticle
+ ==================
+*/
+void CL_SpawnParticle (float org0,						       float org1,						       float org2,
+					   float angle0,					       float angle1,				           float angle2,
+					   float vel0,						       float vel1,					           float vel2,
+					   float accel0,					       float accel1,				           float accel2,
+					   float red,						       float green,				               float blue,
+					   float redVel,					       float greenVel,				           float blueVel,
+					   unsigned int type,
+					   float alpha,					           float alphaVel, 
+					   float size,						       float sizeVel,
+					   unsigned int flags,
+					   float rotation,
+					   float length,                           float lengthVel)
+{
+	cparticle_t   *p = CL_AllocParticle ();
+	if (!p)
+		return;
+
+	// Time
+	p->time = (float)cl.time;
+
+	// Origin
+	Vec3Set (p->org, org0, org1, org2);
+
+	// Angle
+	//Vec3Set (p->angle, angle0, angle1, angle2);
+	 
+	// Velocity
+	Vec3Set (p->vel, vel0, vel1, vel2);
+
+	// Acceleration
+	Vec3Set (p->accel, accel0, accel1, accel2);
+
+	// Color and alpha
+	Vec3Set (p->color, red, green, blue);
+	Vec3Set (p->colorVel, redVel, greenVel, blueVel);
+	p->alpha = alpha;
+	p->alphaVel = alphaVel;
+
+	// Particle texture type
+	p->shader = clMedia.particleTable[type%PT_PICTOTAL];
+
+	// Size
+	p->radius = size;
+	p->radiusVel = sizeVel;
+
+	// Flags
+	p->flags = flags;
+
+	// Rendering flags (TODO!)
+
+	// Rotation
+	p->rotation = rotation;
+
+	// Length
+	p->length = length;
+	p->lengthVel = lengthVel;
+
+	// Think functions (TODO!)
+}
+
+/*
+ ==================
+ CL_ClearParticles
+ ==================
+*/
+void CL_ClearParticles ()
+{
 	int		i;
 	byte	palette[] = {
 #include "../refresh/palette.h"
@@ -117,13 +187,17 @@ void CL_ClearParticles (void){
 
 	cl_particleList[MAX_PARTICLES-1].next = NULL;
 
-	for (i = 0; i < NUM_VERTEX_NORMALS; i++){
+	// Store vertex normals
+	for (i = 0; i < NUM_VERTEX_NORMALS; i++)
+	{
 		cl_particleVelocities[i][0] = (rand() & 255) * 0.01;
 		cl_particleVelocities[i][1] = (rand() & 255) * 0.01;
 		cl_particleVelocities[i][2] = (rand() & 255) * 0.01;
 	}
 
-	for (i = 0; i < 256; i++){
+	// Store palette colors
+	for (i = 0; i < 256; i++)
+	{
 		cl_particlePalette[i][0] = palette[i*3+0] * (1.0/255);
 		cl_particlePalette[i][1] = palette[i*3+1] * (1.0/255);
 		cl_particlePalette[i][2] = palette[i*3+2] * (1.0/255);
@@ -135,15 +209,15 @@ void CL_ClearParticles (void){
  CL_AddParticles
  =================
 */
-void CL_AddParticles (void){
-
+void CL_AddParticles (void)
+{
 	cparticle_t	*p, *next;
 	cparticle_t	*active = NULL, *tail = NULL;
 	color_t		modulate;
 	vec3_t		org, org2, vel, color;
 	vec3_t		ambientLight;
 	float		alpha, radius, length;
-	float		time, time2, gravity, dot;
+	float		time, timeSquared, gravity, dot;
 	int			contents;
 	vec3_t		mins, maxs;
 	trace_t		trace;
@@ -158,7 +232,6 @@ void CL_AddParticles (void){
 		next = p->next;
 
 		time = (cl.time - p->time) * 0.001;
-		time2 = time * time;
 
 		alpha = p->alpha + p->alphaVel * time;
 		radius = p->radius + p->radiusVel * time;
@@ -173,16 +246,20 @@ void CL_AddParticles (void){
 		color[0] = p->color[0] + p->colorVel[0] * time;
 		color[1] = p->color[1] + p->colorVel[1] * time;
 		color[2] = p->color[2] + p->colorVel[2] * time;
+		
+		// Origin
+	    timeSquared = time * time;
+		org[0] = p->org[0] + p->vel[0] * time + p->accel[0] * timeSquared;
+		org[1] = p->org[1] + p->vel[1] * time + p->accel[1] * timeSquared;
+		org[2] = p->org[2] + p->vel[2] * time + p->accel[2] * timeSquared * gravity;
 
-		org[0] = p->org[0] + p->vel[0] * time + p->accel[0] * time2;
-		org[1] = p->org[1] + p->vel[1] * time + p->accel[1] * time2;
-		org[2] = p->org[2] + p->vel[2] * time + p->accel[2] * time2 * gravity;
-
-		if (p->flags & PARTICLE_UNDERWATER){
+		if (p->flags & PARTICLE_UNDERWATER)
+		{
 			// Underwater particle
 			VectorSet(org2, org[0], org[1], org[2] + radius);
 
-			if (!(CL_PointContents(org2, -1) & MASK_WATER)){
+			if (!(CL_PointContents(org2, -1) & MASK_WATER))
+			{
 				// Not underwater
 				CL_FreeParticle(p);
 				continue;
@@ -319,61 +396,42 @@ void CL_AddParticles (void){
 }
 
 /*
- =================
+ ==================
  CL_BlasterTrail
- =================
+ ==================
 */
-void CL_BlasterTrail (const vec3_t start, const vec3_t end, float r, float g, float b){
-
-	cparticle_t	*p;
+void CL_BlasterTrail (const vec3_t start, const vec3_t end, float r, float g, float b)
+{
 	vec3_t		move, vec;
 	float		len, dist;
 
 	if (!cl_particles->integer)
 		return;
 
-	VectorCopy(start, move);
-	VectorSubtract(end, start, vec);
-	len = VectorNormalize(vec);
+	Vec3Copy (start, move);
+	Vec3Subtract (end, start, vec);
+	len = VectorNormalize (vec);
 
-	dist = 1.5;
-	VectorScale(vec, dist, vec);
+	dist = 1.5f;
+	Vec3Scale (vec, dist, vec);
 
-	while (len > 0){
+	for (; len > 0; Vec3Add (move, vec, move))
+	{
 		len -= dist;
 
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.energyParticleShader;
-		p->time = cl.time;
-		p->flags = 0;
-
-		p->org[0] = move[0] + crand();
-		p->org[1] = move[1] + crand();
-		p->org[2] = move[2] + crand();
-		p->vel[0] = crand() * 5;
-		p->vel[1] = crand() * 5;
-		p->vel[2] = crand() * 5;
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = r;
-		p->color[1] = g;
-		p->color[2] = b;
-		p->colorVel[0] = 0;
-		p->colorVel[1] = 0;
-		p->colorVel[2] = 0;
-		p->alpha = 1.0;
-		p->alphaVel = -1.0 / (0.3 + frand() * 0.2);
-		p->radius = 2.4 + (1.2 * crand());
-		p->radiusVel = -2.4 + (1.2 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = 0;
-
-		VectorAdd(move, vec, move);
+		CL_SpawnParticle (
+			move[0] + crand (),					   move[1] + crand (),					   move[2] + crand (),
+			0,					                   0,				                       0,
+			crand () * 5,						   crand () * 5,					       crand () * 5,
+			0,					                   0,				                       0,
+			r,						               g,				                       b,
+			0,					                   0,				                       0,
+			PT_ENERGY,
+			1.0f,					               -1.0f / (0.3f + frand () * 0.2f), 
+			2.4 + (1.2 * crand ()),				   -2.4f + (1.2f * crand ()),
+			0,
+			0,
+			1,                                     0);
 	}
 }
 

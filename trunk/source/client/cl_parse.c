@@ -303,18 +303,18 @@ static void CL_ParseConfigString (void){
 		if (cls.state <= CA_LOADING)
 			return;
 
-		cl.media.gameModels[index-CS_MODELS] = R_RegisterModel(cl.configStrings[index]);
+		clMedia.gameModels[index-CS_MODELS] = R_RegisterModel(cl.configStrings[index]);
 
 		if (cl.configStrings[index][0] == '*')
-			cl.media.gameCModels[index-CS_MODELS] = CM_InlineModel(cl.configStrings[index]);
+			clMedia.gameCModels[index-CS_MODELS] = CM_InlineModel(cl.configStrings[index]);
 		else
-			cl.media.gameCModels[index-CS_MODELS] = NULL;
+			clMedia.gameCModels[index-CS_MODELS] = NULL;
 	}
 	else if (index >= CS_SOUNDS && index < CS_SOUNDS+MAX_SOUNDS){
 		if (cls.state <= CA_LOADING)
 			return;
 
-		cl.media.gameSounds[index-CS_SOUNDS] = S_RegisterSound(cl.configStrings[index]);
+		clMedia.gameSounds[index-CS_SOUNDS] = S_RegisterSound(cl.configStrings[index]);
 	}
 	else if (index >= CS_IMAGES && index < CS_IMAGES+MAX_IMAGES){
 		if (cls.state <= CA_LOADING)
@@ -325,7 +325,7 @@ static void CL_ParseConfigString (void){
 		else
 			Com_StripExtension(cl.configStrings[index], name, sizeof(name));
 
-		cl.media.gameShaders[index-CS_IMAGES] = R_RegisterShaderNoMip(name);
+		clMedia.gameMaterials[index-CS_IMAGES] = R_RegisterShaderNoMip(name);
 	}
 	else if (index >= CS_PLAYERSKINS && index < CS_PLAYERSKINS+MAX_CLIENTS){
 		if (cls.state <= CA_LOADING)
@@ -414,10 +414,10 @@ static void CL_ParseStartSound (void){
 	else	// Use entity number
 		origin = NULL;
 
-	if (!cl.media.gameSounds[sound])
+	if (!clMedia.gameSounds[sound])
 		return;
 
-	S_StartSound(origin, entNum, entChannel, cl.media.gameSounds[sound], volume, attenuation, timeOfs);
+	S_StartSound(origin, entNum, entChannel, clMedia.gameSounds[sound], volume, attenuation, timeOfs);
 }       
 
 /*

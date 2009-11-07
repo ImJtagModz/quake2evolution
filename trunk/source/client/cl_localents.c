@@ -901,7 +901,7 @@ void CL_MachinegunEjectBrass (const centity_t *cent, int count, float x, float y
 		angles[2] = cent->current.angles[2] + (rand() & 31);
 
 		le->entity.entityType = ET_MODEL;
-		le->entity.model = cl.media.modMachinegunBrass;
+		le->entity.model = clMedia.machinegunBrassModel;
 		VectorCopy(le->origin, le->entity.origin);
 		AnglesToAxis(angles, le->entity.axis);
 		MakeRGBA(le->entity.shaderRGBA, 255, 255, 255, 255);
@@ -976,7 +976,7 @@ void CL_ShotgunEjectBrass (const centity_t *cent, int count, float x, float y, f
 		angles[2] = cent->current.angles[2] + (rand() & 31);
 
 		le->entity.entityType = ET_MODEL;
-		le->entity.model = cl.media.modShotgunBrass;
+		le->entity.model = clMedia.shotgunBrassModel;
 		VectorCopy(le->origin, le->entity.origin);
 		AnglesToAxis(angles, le->entity.axis);
 		MakeRGBA(le->entity.shaderRGBA, 255, 255, 255, 255);

@@ -371,47 +371,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="client\cl_load.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="client\cl_localents.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="client\cl_main.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -452,26 +412,6 @@
 			</File>
 			<File
 				RelativePath="client\cl_parse.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="client\cl_particles.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -912,26 +852,6 @@
 			</File>
 			<File
 				RelativePath="qshared\q_math.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="qshared\q_shared.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2064,10 +1984,6 @@
 				>
 			</File>
 			<File
-				RelativePath="qshared\q_shared.h"
-				>
-			</File>
-			<File
 				RelativePath="client\qal.h"
 				>
 			</File>
@@ -2101,10 +2017,6 @@
 			</File>
 			<File
 				RelativePath="client\sound.h"
-				>
-			</File>
-			<File
-				RelativePath="qshared\surfaceflags.h"
 				>
 			</File>
 			<File
@@ -2178,7 +2090,83 @@
 					>
 				</File>
 				<File
+					RelativePath="client\cl_main.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\client\cl_media.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="client\cl_particles.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							PreprocessorDefinitions=""
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
+				Name="Shared"
+				>
+				<File
+					RelativePath=".\shared\s_mathlib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\shared\s_shared.c"
+					>
+				</File>
+				<File
+					RelativePath=".\shared\s_shared.h"
+					>
+				</File>
+				<File
+					RelativePath=".\shared\s_surfaceflags.h"
 					>
 				</File>
 			</Filter>

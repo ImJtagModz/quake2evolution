@@ -412,7 +412,7 @@ void CL_ParseTempEntity (void){
 
 		i = rand() & 15;
 		if (i >= 1 && i <= 3)
-			S_StartSound(pos, 0, 0, cl.media.sfxRichotecs[i-1], 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.ricochet[i-1], 1, ATTN_NORM, 0);
 
 		break;
 	case TE_SHOTGUN:		// Bullet hitting wall
@@ -433,7 +433,7 @@ void CL_ParseTempEntity (void){
 		if (teType == TE_BULLET_SPARKS){
 			i = rand() & 15;
 			if (i >= 1 && i <= 3)
-				S_StartSound(pos, 0, 0, cl.media.sfxRichotecs[i-1], 1, ATTN_NORM, 0);
+				S_StartSound(pos, 0, 0, clMedia.sfx.ricochet[i-1], 1, ATTN_NORM, 0);
 		}
 
 		break;
@@ -447,7 +447,7 @@ void CL_ParseTempEntity (void){
 		else
 			CL_DamageSparkParticles(pos, dir, 40, 0xb0);
 
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
+		S_StartSound (pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 
 		break;
 	case TE_LASER_SPARKS:
@@ -468,7 +468,7 @@ void CL_ParseTempEntity (void){
 		switch (i){
 		case SPLASH_SPARKS:
 			CL_SparkParticles(pos, dir, count);
-			S_StartSound(pos, 0, 0, cl.media.sfxSparks[rand() & 3], 1, ATTN_STATIC, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.spark[rand() & 3], 1, ATTN_STATIC, 0);
 			break;
 		case SPLASH_BLUE_WATER:
 			CL_WaterSplash(pos, dir);
@@ -509,21 +509,21 @@ void CL_ParseTempEntity (void){
 		CL_BlasterParticles(pos, dir, 0.97, 0.46, 0.14);
 		CL_ImpactMark(pos, dir, rand() % 360, 3, 0.97, 0.46, 0.14, 1, true, cl.media.energyMarkShader, false);
 		CL_DynamicLight(pos, 150, 1.0, 1.0, 0.0, true, 350);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-
+		S_StartSound (pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_RAILTRAIL:		// Railgun effect
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadPos(&net_message, pos2);
 
 		// HACK!!!
-		CL_FindTrailPlane(pos, pos2, dir);
+		CL_FindTrailPlane (pos, pos2, dir);
 
-		CL_RailTrail(pos, pos2);
-		CL_ImpactMark(pos2, dir, rand() % 360, 3, 0.09, 0.32, 0.43, 1, true, cl.media.energyMarkShader, false);
-		S_StartSound(pos2, 0, 0, cl.media.sfxRailgun, 1, ATTN_NORM, 0);
-
+		CL_RailTrail (pos, pos2);
+		CL_ImpactMark (pos2, dir, rand() % 360, 3, 0.09, 0.32, 0.43, 1, true, cl.media.energyMarkShader, false);
+		S_StartSound (pos2, 0, 0, clMedia.sfx.mz.railgunFireSfx, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_GRENADE_EXPLOSION:
 	case TE_GRENADE_EXPLOSION_WATER:
 		MSG_ReadPos(&net_message, pos);
@@ -533,14 +533,14 @@ void CL_ParseTempEntity (void){
 			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.grenadeExplosionShader);
 			CL_ExplosionParticles(pos);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
-			S_StartSound(pos, 0, 0, cl.media.sfxGrenadeExplosion, 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.grenadeExplosion, 1, ATTN_NORM, 0);
 		}
 		else {
 			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.grenadeExplosionWaterShader);
 			CL_ExplosionWaterSplash(pos);
 			CL_BubbleParticles(pos, 384, 30);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
-			S_StartSound(pos, 0, 0, cl.media.sfxWaterExplosion, 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.waterExplosion, 1, ATTN_NORM, 0);
 		}
 
 		break;
@@ -557,14 +557,14 @@ void CL_ParseTempEntity (void){
 			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
 			CL_ExplosionParticles(pos);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
-			S_StartSound(pos, 0, 0, cl.media.sfxRocketExplosion, 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.rocketExplosion, 1, ATTN_NORM, 0);
 		}
 		else {
 			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionWaterShader);
 			CL_ExplosionWaterSplash(pos);
 			CL_BubbleParticles(pos, 384, 30);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
-			S_StartSound(pos, 0, 0, cl.media.sfxWaterExplosion, 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.waterExplosion, 1, ATTN_NORM, 0);
 		}
 
 		break;
@@ -581,7 +581,7 @@ void CL_ParseTempEntity (void){
 			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
 			CL_ExplosionParticles(pos);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
-			S_StartSound(pos, 0, 0, cl.media.sfxRocketExplosion, 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.rocketExplosion, 1, ATTN_NORM, 0);
 		}
 		else {
 			// HACK!!!
@@ -590,7 +590,7 @@ void CL_ParseTempEntity (void){
 			CL_Explosion(pos, dir, 60, rand() % 360, 500, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
 			CL_ExplosionParticles(pos);
 			CL_ImpactMark(pos, dir, rand() % 360, 60, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
-			S_StartSound(pos, 0, 0, cl.media.sfxRocketExplosion, 1, ATTN_NORM, 0);
+			S_StartSound(pos, 0, 0, clMedia.sfx.rocketExplosion, 1, ATTN_NORM, 0);
 		}
 
 		break;
@@ -636,15 +636,15 @@ void CL_ParseTempEntity (void){
 		break;
 	case TE_GRAPPLE_CABLE:
 		CL_ParseGrapple();
-
 		break;
+
 	case TE_BOSSTPORT:		// Boss teleporting to station
 		MSG_ReadPos(&net_message, pos);
 
-		CL_BigTeleportParticles(pos);
-		S_StartSound(pos, 0, 0, S_RegisterSound("misc/bigtele.wav"), 1, ATTN_NONE, 0);
-
+		CL_BigTeleportParticles (pos);
+		S_StartSound (pos, 0, 0, clMedia.sfx.bigTeleport, 1, ATTN_NONE, 0);
 		break;
+
 	case TE_WELDING_SPARKS:
 		count = MSG_ReadByte(&net_message);
 		MSG_ReadPos(&net_message, pos);
@@ -685,9 +685,9 @@ void CL_ParseTempEntity (void){
 		CL_BlasterParticles(pos, dir, 0.00, 1.00, 0.00);
 		CL_ImpactMark(pos, dir, rand() % 360, 3, 0, 1, 0, 1, true, cl.media.energyMarkShader, false);
 		CL_DynamicLight(pos, 150, 0.0, 1.0, 0.0, true, 350);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-
+		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_FLECHETTE:
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadDir(&net_message, dir);
@@ -695,14 +695,14 @@ void CL_ParseTempEntity (void){
 		CL_BulletParticles(pos, dir);
 		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, cl.media.bulletMarkShader, false);
 		CL_DynamicLight(pos, 150, 0.19, 0.41, 0.75, true, 350);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-
+		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_LIGHTNING:
 		ent = CL_ParseLightning();
-		S_StartSound(NULL, ent, CHAN_WEAPON, cl.media.sfxLightning, 1, ATTN_NORM, 0);
-
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.lightning, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_FLASHLIGHT:
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadShort(&net_message);
@@ -731,18 +731,18 @@ void CL_ParseTempEntity (void){
 		MSG_ReadDir(&net_message, dir);
 
 		CL_BlasterParticles(pos, dir, 0.97, 0.46, 0.14);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-		
+		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_HEATBEAM_STEAM:
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadDir(&net_message, dir);
 	
 		CL_BlasterParticles(pos, dir, 0.97, 0.46, 0.14);
 		CL_ImpactMark(pos, dir, rand() % 360, 3, 0.97, 0.46, 0.14, 1, true, cl.media.energyMarkShader, false);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-		
+		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_STEAM:
 		CL_ParseSteam();
 
@@ -752,9 +752,9 @@ void CL_ParseTempEntity (void){
 		MSG_ReadPos(&net_message, pos2);
 
 		CL_BubbleTrail(pos, pos2, 8, 1);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-		
+		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_CHAINFIST_SMOKE:
 		MSG_ReadPos(&net_message, pos);
 
@@ -766,15 +766,15 @@ void CL_ParseTempEntity (void){
 		MSG_ReadDir(&net_message, dir);
 
 		CL_BulletParticles(pos, dir);
-		S_StartSound(pos, 0, 0, cl.media.sfxLaserHit, 1, ATTN_NORM, 0);
-		
+		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
+
 	case TE_TRACKER_EXPLOSION:
 		MSG_ReadPos(&net_message, pos);
 
 		CL_TrackerExplosionParticles(pos);
 		CL_DynamicLight(pos, 150, -1.0, -1.0, -1.0, false, 100);
-		S_StartSound(pos, 0, 0, cl.media.sfxDisruptorExplosion, 1, ATTN_NORM, 0);
+		S_StartSound(pos, 0, 0, clMedia.sfx.disruptExplosion, 1, ATTN_NORM, 0);
 		
 		break;
 	case TE_TELEPORT_EFFECT:
@@ -928,7 +928,7 @@ static void CL_AddBeams (void){
 		angles[2] = rand() % 360;
 
 		ent.entityType = ET_MODEL;
-		ent.model = cl.media.modParasiteBeam;
+		ent.model = clMedia.parasiteSegmentModel;
 		AnglesToAxis(angles, ent.axis);
 		MakeRGBA(ent.shaderRGBA, 255, 255, 255, 255);
 

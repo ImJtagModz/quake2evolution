@@ -154,7 +154,7 @@ static void R_AddSurfaceToList (surface_t *surf, entity_t *entity){
 	lmNum = surf->lmNum;
 
 	// Check for lightmap modification
-	if (r_dynamicLights->integer && (shader->flags & SHADER_HASLIGHTMAP)){
+	if (gl_dynamic->integer && (shader->flags & SHADER_HASLIGHTMAP)){
 		if (surf->dlightFrame == r_frameCount)
 			lmNum = 255;
 		else {
@@ -232,7 +232,7 @@ void R_AddBrushModelToList (entity_t *entity){
 	}
 
 	// Calculate dynamic lighting
-	if (r_dynamicLights->integer){
+	if (gl_dynamic->integer){
 		for (l = 0, dl = r_dlights; l < r_numDLights; l++, dl++){
 			if (!BoundsAndSphereIntersect(mins, maxs, dl->origin, dl->intensity))
 				continue;

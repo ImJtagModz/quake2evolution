@@ -81,7 +81,7 @@ trace_t CL_Trace (const vec3_t start, const vec3_t mins, const vec3_t maxs, cons
 
 		if (ent->solid == 31){
 			// Special value for brush model
-			cmodel = cl.media.gameCModels[ent->modelindex];
+			cmodel = clMedia.gameCModels[ent->modelindex];
 			if (!cmodel)
 				continue;
 
@@ -149,7 +149,7 @@ int	CL_PointContents (const vec3_t point, int skipNumber){
 		if (ent->solid != 31)	// Special value for brush model
 			continue;
 
-		cmodel = cl.media.gameCModels[ent->modelindex];
+		cmodel = clMedia.gameCModels[ent->modelindex];
 		if (!cmodel)
 			continue;
 

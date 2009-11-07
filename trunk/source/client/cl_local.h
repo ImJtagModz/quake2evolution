@@ -1,5 +1,7 @@
 /*
+===========================================================================
 Copyright (C) 1997-2001 Id Software, Inc.
+Copyright (C) 2009-2010 Quake 2 Evolution.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -15,11 +17,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
+===========================================================================
 */
 
-
-// cl_local.h -- primary header for client
+//
+// cl_local.h
+// - Primary header for client
+//
 
 
 #ifndef __CLIENT_H__
@@ -76,27 +80,129 @@ typedef struct {
 	int				parseEntitiesIndex;	// Non-masked index into cl.parseEntities array
 } frame_t;
 
+enum {
+	// Particles
+	PT_ENERGY,
+
+	// Total
+	PT_PICTOTAL
+};
+
+// Surface-specific step sounds
+typedef struct clStepMedia_s {
+	struct sfx_s	*standard[4];
+} clStepMedia_t;
+
+// Muzzle flash sounds
+typedef struct clMzMedia_s {
+	struct sfx_s	*bfgFireSfx;
+	struct sfx_s	*blasterFireSfx;
+	struct sfx_s	*etfRifleFireSfx;
+	struct sfx_s	*grenadeFireSfx;
+	struct sfx_s	*grenadeReloadSfx;
+	struct sfx_s	*hyperBlasterFireSfx;
+	struct sfx_s	*ionRipperFireSfx;
+	struct sfx_s	*machineGunSfx[5];
+	struct sfx_s	*phalanxFireSfx;
+	struct sfx_s	*railgunFireSfx;
+	struct sfx_s	*railgunReloadSfx;
+	struct sfx_s	*rocketFireSfx;
+	struct sfx_s	*rocketReloadSfx;
+	struct sfx_s	*shotgunFireSfx;
+	struct sfx_s	*shotgun2FireSfx;
+	struct sfx_s	*shotgunReloadSfx;
+	struct sfx_s	*superShotgunFireSfx;
+	struct sfx_s	*trackerFireSfx;
+} clMzMedia_t;
+
+// Monster muzzle flash sounds
+typedef struct clMz2Media_s {
+	struct sfx_s	*chickRocketSfx;
+	struct sfx_s	*floatBlasterSfx;
+	struct sfx_s	*flyerBlasterSfx;
+	struct sfx_s	*gunnerGrenadeSfx;
+	struct sfx_s	*gunnerMachGunSfx;
+	struct sfx_s	*hoverBlasterSfx;
+	struct sfx_s	*jorgMachGunSfx;
+	struct sfx_s	*machGunSfx;
+	struct sfx_s	*makronBlasterSfx;
+	struct sfx_s	*medicBlasterSfx;
+	struct sfx_s	*soldierBlasterSfx;
+	struct sfx_s	*soldierMachGunSfx;
+	struct sfx_s	*soldierShotgunSfx;
+	struct sfx_s	*superTankRocketSfx;
+	struct sfx_s	*tankBlasterSfx;
+	struct sfx_s	*tankMachGunSfx[5];
+	struct sfx_s	*tankRocketSfx;
+} clMz2Media_t;
+
+// All sounds
+typedef struct clMediaSounds_s {
+	clStepMedia_t		steps;
+	clMzMedia_t			mz;
+	clMz2Media_t		mz2;
+
+	struct sfx_s		*ricochet[3];
+	struct sfx_s		*spark[3];
+
+	struct sfx_s		*disruptExplosion;
+	struct sfx_s		*grenadeExplosion;
+	struct sfx_s		*rocketExplosion;
+	struct sfx_s		*waterExplosion;
+
+	struct sfx_s		*itemRespawn;
+	struct sfx_s		*laserHit;
+	struct sfx_s		*lightning;
+
+	struct sfx_s		*playerFall;
+	struct sfx_s		*playerFallShort;
+	struct sfx_s		*playerFallFar;
+
+	struct sfx_s		*playerTeleport;
+	struct sfx_s		*bigTeleport;
+} clMediaSounds_t;
+
+// ===========================================================================
+
 // The client precaches these files during level load
-typedef struct {
+typedef struct clMedia_s {
 	// Sounds
-	struct sfx_s	*sfxRichotecs[3];
-	struct sfx_s	*sfxSparks[3];
-	struct sfx_s	*sfxFootSteps[4];
-	struct sfx_s	*sfxLaserHit;
-	struct sfx_s	*sfxRailgun;
-	struct sfx_s	*sfxRocketExplosion;
-	struct sfx_s	*sfxGrenadeExplosion;
-	struct sfx_s	*sfxWaterExplosion;
-	struct sfx_s	*sfxMachinegunBrass;
-	struct sfx_s	*sfxShotgunBrass;
-	struct sfx_s	*sfxLightning;
-	struct sfx_s	*sfxDisruptorExplosion;
+	clMediaSounds_t		sfx;
 
 	// Models
-	struct model_s	*modParasiteBeam;
-	struct model_s	*modPowerScreenShell;
-	struct model_s	*modMachinegunBrass;
-	struct model_s	*modShotgunBrass;
+	struct model_s	    *parasiteSegmentModel;
+	struct model_s	    *powerScreenModel;
+
+	struct model_s	    *machinegunBrassModel;
+	struct model_s	    *shotgunBrassModel;
+
+	// Images
+	struct shader_s		*crosshairMaterial[NUM_CROSSHAIRS];
+
+	struct shader_s		*hudNumMaterials[2][11];
+
+	struct shader_s	    *lagometerMaterial;
+	struct shader_s	    *disconnectedMaterial;
+	struct shader_s	    *backTileMaterial;
+	struct shader_s	    *pauseMaterial;
+
+	// Particle / decal media
+	struct shader_s		*particleTable[PT_PICTOTAL];
+
+	// Files referenced by the server that the client needs
+	struct sfx_s	*gameSounds[MAX_SOUNDS];
+	struct model_s	*gameModels[MAX_MODELS];
+	struct cmodel_s	*gameCModels[MAX_MODELS];
+	struct shader_s	*gameMaterials[MAX_IMAGES];
+} clMedia_t;
+
+extern clMedia_t	clMedia;
+
+// ===========================================================================
+
+typedef struct {
+	struct sfx_s	*sfxMachinegunBrass;
+	struct sfx_s	*sfxShotgunBrass;
 
 	// Shaders
 	struct shader_s	*levelshot;
@@ -104,12 +210,7 @@ typedef struct {
 	struct shader_s	*loadingLogo;
 	struct shader_s	*loadingDetail[2];
 	struct shader_s	*loadingPercent[20];
-	struct shader_s	*lagometerShader;
-	struct shader_s	*disconnectedShader;
-	struct shader_s	*backTileShader;
-	struct shader_s	*pauseShader;
-	struct shader_s	*crosshairShaders[NUM_CROSSHAIRS];
-	struct shader_s	*hudNumberShaders[2][11];
+
 	struct shader_s	*viewBloodBlend;
 	struct shader_s	*viewFireBlend;
 	struct shader_s	*viewIrGoggles;
@@ -152,12 +253,6 @@ typedef struct {
 	struct shader_s	*bulletMarkShader;
 	struct shader_s	*burnMarkShader;
 	struct shader_s	*bloodMarkShaders[2][6];
-
-	// Files referenced by the server that the client needs
-	struct sfx_s	*gameSounds[MAX_SOUNDS];
-	struct model_s	*gameModels[MAX_MODELS];
-	struct cmodel_s	*gameCModels[MAX_MODELS];
-	struct shader_s	*gameShaders[MAX_IMAGES];
 } gameMedia_t;
 
 typedef struct {
@@ -420,6 +515,7 @@ extern cvar_t	*cl_thirdPersonRange;
 extern cvar_t	*cl_thirdPersonAngle;
 extern cvar_t	*cl_viewBlend;
 extern cvar_t	*cl_particles;
+extern cvar_t	*cl_particleMax;
 extern cvar_t	*cl_particleLOD;
 extern cvar_t	*cl_particleBounce;
 extern cvar_t	*cl_particleFriction;
@@ -604,7 +700,7 @@ void		CL_ParseServerMessage (void);
 // =====================================================================
 // cl_particles.c
 
-void		CL_ClearParticles (void);
+void		CL_ClearParticles ();
 void		CL_AddParticles (void);
 
 void		CL_BlasterTrail (const vec3_t start, const vec3_t end, float r, float g, float b);
