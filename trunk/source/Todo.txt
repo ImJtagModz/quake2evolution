@@ -14,13 +14,14 @@ Client
 * Add shadows from the player model
 
 Bugs
+* The gravity on particles when you are lets say the flyer in vortex is fucked up
+* p_auth map has a very wierd obilivion at the monsters start, wtf can this be?
 * Find out why it never really connects to online servers like vortex;
 you have to force it to connect
 * Alpha spawning monsters in vortex doenst work, i cant see them'
   - This has to do with ent.flags and RF_ / EF_ flags in CL_AddPacketEntities 
 
 Done
-
   
 New in 0.2.0
 * Material script system
