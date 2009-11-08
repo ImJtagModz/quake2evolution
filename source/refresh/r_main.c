@@ -636,13 +636,15 @@ void R_DrawParticle (void){
 	// Draw it
 	RB_CheckMeshOverflow(6, 4);
 	
-	for (i = 2; i < 4; i++){
+	for (i = 2; i < 4; i++)
+	{
 		indexArray[numIndex++] = numVertex + 0;
 		indexArray[numIndex++] = numVertex + i-1;
 		indexArray[numIndex++] = numVertex + i;
 	}
 
-	if (particle->length != 1){
+	if (particle->length != 1)
+	{
 		// Find orientation vectors
 		VectorSubtract(r_refDef.viewOrigin, particle->origin, axis[0]);
 		VectorSubtract(particle->oldOrigin, particle->origin, axis[1]);
@@ -671,8 +673,10 @@ void R_DrawParticle (void){
 		vertexArray[numVertex+3][1] = particle->oldOrigin[1] - axis[2][1];
 		vertexArray[numVertex+3][2] = particle->oldOrigin[2] - axis[2][2];
 	}
-	else {
-		if (particle->rotation){
+	else 
+	{
+		if (particle->rotation)
+		{
 			// Rotate it around its normal
 			RotatePointAroundVector(axis[1], r_refDef.viewAxis[0], r_refDef.viewAxis[1], particle->rotation);
 			CrossProduct(r_refDef.viewAxis[0], axis[1], axis[2]);
@@ -684,7 +688,8 @@ void R_DrawParticle (void){
 			VectorScale(axis[1], particle->radius, axis[1]);
 			VectorScale(axis[2], particle->radius, axis[2]);
 		}
-		else {
+		else 
+		{
 			// The normal should point at the viewer
 			VectorNegate(r_refDef.viewAxis[0], axis[0]);
 
@@ -693,20 +698,28 @@ void R_DrawParticle (void){
 			VectorScale(r_refDef.viewAxis[2], particle->radius, axis[2]);
 		}
 
+		// Top right
 		vertexArray[numVertex+0][0] = particle->origin[0] + axis[1][0] + axis[2][0];
-		vertexArray[numVertex+0][1] = particle->origin[1] + axis[1][1] + axis[2][1];
+		vertexArray[numVertex+0][1] = particle->origin[1] + axis[1][1] + axis[2][1]; 
 		vertexArray[numVertex+0][2] = particle->origin[2] + axis[1][2] + axis[2][2];
+
+		// Bottom right
 		vertexArray[numVertex+1][0] = particle->origin[0] - axis[1][0] + axis[2][0];
 		vertexArray[numVertex+1][1] = particle->origin[1] - axis[1][1] + axis[2][1];
 		vertexArray[numVertex+1][2] = particle->origin[2] - axis[1][2] + axis[2][2];
+
+		// Bottom left
 		vertexArray[numVertex+2][0] = particle->origin[0] - axis[1][0] - axis[2][0];
 		vertexArray[numVertex+2][1] = particle->origin[1] - axis[1][1] - axis[2][1];
 		vertexArray[numVertex+2][2] = particle->origin[2] - axis[1][2] - axis[2][2];
+
+		// Top left
 		vertexArray[numVertex+3][0] = particle->origin[0] + axis[1][0] - axis[2][0];
 		vertexArray[numVertex+3][1] = particle->origin[1] + axis[1][1] - axis[2][1];
 		vertexArray[numVertex+3][2] = particle->origin[2] + axis[1][2] - axis[2][2];
 	}
 
+	// Draw texture onto the triangle
 	inTexCoordArray[numVertex+0][0] = 0;
 	inTexCoordArray[numVertex+0][1] = 0;
 	inTexCoordArray[numVertex+1][0] = 1;
@@ -716,10 +729,14 @@ void R_DrawParticle (void){
 	inTexCoordArray[numVertex+3][0] = 0;
 	inTexCoordArray[numVertex+3][1] = 1;
 
-	for (i = 0; i < 4; i++){
+	for (i = 0; i < 4; i++)
+	{
+		// Draw the triangle normal
 		normalArray[numVertex][0] = axis[0][0];
 		normalArray[numVertex][1] = axis[0][1];
 		normalArray[numVertex][2] = axis[0][2];
+
+		// Draw RGBA
 		inColorArray[numVertex][0] = particle->modulate[0];
 		inColorArray[numVertex][1] = particle->modulate[1];
 		inColorArray[numVertex][2] = particle->modulate[2];

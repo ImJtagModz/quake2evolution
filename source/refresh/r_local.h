@@ -436,6 +436,7 @@ typedef struct shader_s {
 	int						shaderNum;
 	shaderType_t			shaderType;
 	unsigned				surfaceParm;
+	unsigned int			surfaceType;
 
 	unsigned				flags;
 

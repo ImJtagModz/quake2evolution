@@ -37,25 +37,40 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct cparticle_s {
 	struct		cparticle_s *next;
 
-	struct		shader_s *shader;
-	int			time;
-	int			flags;
+	struct		            shader_s *shader;
+	int			            time;
+	int			            flags;
 
-	vec3_t		org;
-	vec3_t		vel;
-	vec3_t		accel;
-	vec3_t		color;
-	vec3_t		colorVel;
-	float		alpha;
-	float		alphaVel;
-	float		radius;
-	float		radiusVel;
-	float		length;
-	float		lengthVel;
-	float		rotation;
-	float		bounceFactor;
+	vec3_t		            org;
+	vec3_t                  angle;
+	vec3_t		            vel;
+	vec3_t		            accel;
+	vec4_t		            color,		            colorVel;
+	float		            size,                   sizeVel;
+	float		            length,                 lengthVel;
+	float		            rotation;
+	float		            bounceFactor;
+	float                   alpha, alphaVel; // ::REMOVE ME::
 
-	vec3_t		lastOrg;
+	vec3_t		            lastOrg;
+
+	qboolean				(*preThink)(struct cparticle_t *p, const float deltaTime, float *nextThinkTime, vec3_t org, vec3_t lastOrg, vec3_t angle, vec3_t color, float *size, float *rotation, float *time);
+	qboolean				bPreThinkNext;
+	float					lastPreThinkTime;
+	float					nextPreThinkTime;
+	vec3_t					lastPreThinkOrigin;
+
+	qboolean				(*think)(struct cparticle_t *p, const float deltaTime, float *nextThinkTime, vec3_t org, vec3_t lastOrg, vec3_t angle, vec3_t color, float *size, float *rotation, float *time);
+	qboolean				bThinkNext;
+	float					lastThinkTime;
+	float					nextThinkTime;
+	vec3_t					lastThinkOrigin;
+
+	qboolean				(*postThink)(struct cparticle_t *p, const float deltaTime, float *nextThinkTime, vec3_t org, vec3_t lastOrg, vec3_t angle, vec3_t color, float *size, float *rotation, float *time);
+	qboolean				bPostThinkNext;
+	float					lastPostThinkTime;
+	float					nextPostThinkTime;
+	vec3_t					lastPostThinkOrigin;
 } cparticle_t;
 
 static cparticle_t	*cl_activeParticles;
@@ -117,8 +132,12 @@ void CL_SpawnParticle (float org0,						       float org1,						       float org
 					   float alpha,					           float alphaVel, 
 					   float size,						       float sizeVel,
 					   unsigned int flags,
+					   float bounce,
 					   float rotation,
-					   float length,                           float lengthVel)
+					   float length,                           float lengthVel,
+					   qboolean (*preThink)(struct cparticle_t *p, const float deltaTime, float *nextThinkTime, vec3_t org, vec3_t lastOrg, vec3_t angle, vec3_t color, float *size, float *rotation, float *time),
+					   qboolean (*think)(struct cparticle_t *p, const float deltaTime, float *nextThinkTime, vec3_t org, vec3_t lastOrg, vec3_t angle, vec3_t color, float *size, float *rotation, float *time),
+					   qboolean (*postThink)(struct cparticle_t *p, const float deltaTime, float *nextThinkTime, vec3_t org, vec3_t lastOrg, vec3_t angle, vec3_t color, float *size, float *rotation, float *time))
 {
 	cparticle_t   *p = CL_AllocParticle ();
 	if (!p)
@@ -129,9 +148,10 @@ void CL_SpawnParticle (float org0,						       float org1,						       float org
 
 	// Origin
 	Vec3Set (p->org, org0, org1, org2);
+	Vec3Copy (p->org, p->lastOrg);
 
 	// Angle
-	//Vec3Set (p->angle, angle0, angle1, angle2);
+	Vec3Set (p->angle, angle0, angle1, angle2);
 	 
 	// Velocity
 	Vec3Set (p->vel, vel0, vel1, vel2);
@@ -140,20 +160,21 @@ void CL_SpawnParticle (float org0,						       float org1,						       float org
 	Vec3Set (p->accel, accel0, accel1, accel2);
 
 	// Color and alpha
-	Vec3Set (p->color, red, green, blue);
-	Vec3Set (p->colorVel, redVel, greenVel, blueVel);
-	p->alpha = alpha;
-	p->alphaVel = alphaVel;
+	Vec4Set (p->color, red, green, blue, alpha);
+	Vec4Set (p->colorVel, redVel, greenVel, blueVel, alphaVel);
 
 	// Particle texture type
 	p->shader = clMedia.particleTable[type%PT_PICTOTAL];
 
 	// Size
-	p->radius = size;
-	p->radiusVel = sizeVel;
+	p->size = size;
+	p->sizeVel = sizeVel;
 
 	// Flags
 	p->flags = flags;
+
+	// Bouncing
+	p->bounceFactor = bounce;
 
 	// Rendering flags (TODO!)
 
@@ -164,7 +185,50 @@ void CL_SpawnParticle (float org0,						       float org1,						       float org
 	p->length = length;
 	p->lengthVel = lengthVel;
 
-	// Think functions (TODO!)
+	// Think functions
+	p->preThink = preThink;
+	p->bPreThinkNext = (preThink != NULL);
+	if (p->bPreThinkNext)
+	{
+		p->lastPreThinkTime = p->time;
+		p->nextPreThinkTime = p->time;
+		Vec3Copy (p->org, p->lastPreThinkOrigin);
+	}
+
+	p->think = think;
+	p->bThinkNext = (think != NULL);
+	if (p->bThinkNext)
+	{
+		p->lastThinkTime = p->time;
+		p->nextThinkTime = p->time;
+		Vec3Copy (p->org, p->lastThinkOrigin);
+	}
+
+	p->postThink = postThink;
+	p->bPostThinkNext = (postThink != NULL);
+	if (p->bPostThinkNext)
+	{
+		p->lastPostThinkTime = p->time;
+		p->nextPostThinkTime = p->time;
+		Vec3Copy (p->org, p->lastPostThinkOrigin);
+	}
+}
+
+/*
+ ==================
+ CL_SurfaceParticles
+
+ - FIXME: This will be called in the CL_ParseTempEnt func
+ where TE_SHOTGUN and TE_BULLET is also in the footstep func
+ ==================
+*/
+void CL_SurfaceParticles (const vec3_t org, const vec3_t dir)
+{
+	//cparticle_t   *p;
+
+	// Metal
+//	if (p->shader->surfaceType |= SURFACE_TYPE_METAL)
+//		CL_BulletParticles (org, dir);
 }
 
 /*
@@ -209,59 +273,146 @@ void CL_ClearParticles ()
  CL_AddParticles
  =================
 */
+#define PART_INSTANT	-1000.0f
 void CL_AddParticles (void)
 {
 	cparticle_t	*p, *next;
 	cparticle_t	*active = NULL, *tail = NULL;
 	color_t		modulate;
-	vec3_t		org, org2, vel, color;
+	vec3_t		org, org2, vel;
 	vec3_t		ambientLight;
-	float		alpha, radius, length;
-	float		time, timeSquared, gravity, dot;
+	float		length;
+	float		time, gravity, dot;
 	int			contents;
 	vec3_t		mins, maxs;
 	trace_t		trace;
+
+	vec4_t      color;
+	qboolean    bHadAThought = false;
+	float       timeSquared;
+	float       size, rotation = p->rotation;
+	int         i;
 
 	if (!cl_particles->integer)
 		return;
 
 	gravity = cl.playerState->pmove.gravity / 800.0;
 
-	for (p = cl_activeParticles; p; p = next){
+	for (p = cl_activeParticles; p; p = next)
+	{
 		// Grab next now, so if the particle is freed we still have it
 		next = p->next;
 
-		time = (cl.time - p->time) * 0.001;
+		// Alpha and time calcs
+		if (p->colorVel[3] > PART_INSTANT)
+		{
+			time = (cl.time - p->time) * 0.001f;
+			color[3] = p->color[3] + time * p->colorVel[3];
+		}
+		else
+		{
+			time = 1;
+			color[3] = p->color[3];
+		}
 
-		alpha = p->alpha + p->alphaVel * time;
-		radius = p->radius + p->radiusVel * time;
+		// sizeVel calcs
+		if (p->colorVel[3] > PART_INSTANT && p->size != p->sizeVel)
+		{
+			if (p->size > p->sizeVel) // Shrink
+				size = p->size - ((p->size - p->sizeVel) * (p->color[3] - color[3]));
+			else // Grow
+				size = p->size + ((p->sizeVel - p->size) * (p->color[3] - color[3]));
+		}
+		else
+			size = p->size;
+
+		// Length calcs
 		length = p->length + p->lengthVel * time;
 
-		if (alpha <= 0 || radius <= 0 || length <= 0){
-			// Faded out
-			CL_FreeParticle(p);
+		// Faded out
+		if (color[3] <= 0 || size <= 0 || length <= 0)
+		{
+			CL_FreeParticle (p);
 			continue;
 		}
 
-		color[0] = p->color[0] + p->colorVel[0] * time;
-		color[1] = p->color[1] + p->colorVel[1] * time;
-		color[2] = p->color[2] + p->colorVel[2] * time;
-		
+		// Alpha should not reach over 1.0f there for we
+		// set it to 1.0f max
+		if (color[3] > 1.0)
+			color[3] = 1.0f;
+
+		// colorVel calcs
+		Vec3Copy(p->color, color);
+		if (p->colorVel[3] > PART_INSTANT)
+		{
+			for (i=0 ; i<3 ; i++)
+			{
+				if (p->color[i] != p->colorVel[i])
+				{
+					if (p->color[i] > p->colorVel[i])
+						color[i] = p->color[i] - ((p->color[i] - p->colorVel[i]) * (p->color[3] - color[3]));
+					else
+						color[i] = p->color[i] + ((p->colorVel[i] - p->color[i]) * (p->color[3] - color[3]));
+				}
+			}
+		}
+
 		// Origin
-	    timeSquared = time * time;
+		timeSquared = time * time;
 		org[0] = p->org[0] + p->vel[0] * time + p->accel[0] * timeSquared;
 		org[1] = p->org[1] + p->vel[1] * time + p->accel[1] * timeSquared;
 		org[2] = p->org[2] + p->vel[2] * time + p->accel[2] * timeSquared * gravity;
 
+		// Think functions
+		if (p->bPreThinkNext && cl.time >= p->nextPreThinkTime)
+		{
+			p->bPreThinkNext = p->preThink(p, cl.time-p->lastPreThinkTime, &p->nextPreThinkTime, org, p->lastPreThinkOrigin, p->angle, color, &size, &rotation, &time);
+			p->lastPreThinkTime = cl.time;
+			Vec3Copy(org, p->lastPreThinkOrigin);
+
+			bHadAThought = true;
+		}
+
+		if (p->bThinkNext && cl.time >= p->nextThinkTime)
+		{
+			p->bThinkNext = p->think(p, cl.time-p->lastThinkTime, &p->nextThinkTime, org, p->lastThinkOrigin, p->angle, color, &size, &rotation, &time);
+			p->lastThinkTime = cl.time;
+			Vec3Copy(org, p->lastThinkOrigin);
+
+			bHadAThought = true;
+		}
+
+		if (p->bPostThinkNext && cl.time >= p->nextPostThinkTime)
+		{
+			p->bPostThinkNext = p->postThink(p, cl.time-p->lastPostThinkTime, &p->nextPostThinkTime, org, p->lastPostThinkOrigin, p->angle, color, &size, &rotation, &time);
+			p->lastPostThinkTime = cl.time;
+			Vec3Copy(org, p->lastPostThinkOrigin);
+
+			bHadAThought = true;
+		}
+
+		// Check alpha and size after the think function runs
+		if (bHadAThought)
+		{
+			if (color[3] <= TINY_NUMBER)
+			{
+				goto nextParticle;
+			}
+			if (size <= TINY_NUMBER)
+			{
+				goto nextParticle;
+			}
+		}
+
+		// Underwater particle
 		if (p->flags & PARTICLE_UNDERWATER)
 		{
-			// Underwater particle
-			VectorSet(org2, org[0], org[1], org[2] + radius);
+			VectorSet (org2, org[0], org[1], org[2] + size);
 
+			// Not underwater
 			if (!(CL_PointContents(org2, -1) & MASK_WATER))
 			{
-				// Not underwater
-				CL_FreeParticle(p);
+				CL_FreeParticle (p);
 				continue;
 			}
 		}
@@ -269,27 +420,35 @@ void CL_AddParticles (void)
 		p->next = NULL;
 		if (!tail)
 			active = tail = p;
-		else {
+		else 
+		{
 			tail->next = p;
 			tail = p;
 		}
 
-		if (p->flags & PARTICLE_FRICTION){
-			// Water friction affected particle
+        // Water friction affected particle
+		if (p->flags & PARTICLE_FRICTION)
+		{
 			contents = CL_PointContents(org, -1);
-			if (contents & MASK_WATER){
+			if (contents & MASK_WATER)
+			{
 				// Add friction
-				if (contents & CONTENTS_WATER){
-					VectorScale(p->vel, 0.25, p->vel);
-					VectorScale(p->accel, 0.25, p->accel);
+				if (contents & CONTENTS_WATER)
+				{
+					VectorScale (p->vel, 0.25f, p->vel);
+					VectorScale (p->accel, 0.25f, p->accel);
 				}
-				if (contents & CONTENTS_SLIME){
-					VectorScale(p->vel, 0.20, p->vel);
-					VectorScale(p->accel, 0.20, p->accel);
+
+				if (contents & CONTENTS_SLIME)
+				{
+					VectorScale (p->vel, 0.20f, p->vel);
+					VectorScale (p->accel, 0.20f, p->accel);
 				}
-				if (contents & CONTENTS_LAVA){
-					VectorScale(p->vel, 0.10, p->vel);
-					VectorScale(p->accel, 0.10, p->accel);
+
+				if (contents & CONTENTS_LAVA)
+				{
+					VectorScale (p->vel, 0.10f, p->vel);
+					VectorScale (p->accel, 0.10f, p->accel);
 				}
 
 				length = 1;
@@ -300,9 +459,9 @@ void CL_AddParticles (void)
 				// Reset
 				p->time = cl.time;
 				VectorCopy(org, p->org);
-				VectorCopy(color, p->color);
-				p->alpha = alpha;
-				p->radius = radius;
+				VectorCopy (color, p->color);
+				p->color[3] = color[3];
+				p->size = size;
 
 				// Don't stretch
 				p->flags &= ~PARTICLE_STRETCH;
@@ -312,36 +471,41 @@ void CL_AddParticles (void)
 			}
 		}
 
-		if (p->flags & PARTICLE_BOUNCE){
-			// Bouncy particle
-			VectorSet(mins, -radius, -radius, -radius);
-			VectorSet(maxs, radius, radius, radius);
+		// Bouncy particle
+		if (p->flags & PARTICLE_BOUNCE)
+		{
+			VectorSet (mins, -size, -size, -size);
+			VectorSet (maxs, size, size, size);
 
 			trace = CL_Trace(p->lastOrg, mins, maxs, org, cl.clientNum, MASK_SOLID, true, NULL);
-			if (trace.fraction != 0.0 && trace.fraction != 1.0){
+			if (trace.fraction != 0.0 && trace.fraction != 1.0)
+			{
 				// Reflect velocity
 				time = cl.time - (cls.frameTime + cls.frameTime * trace.fraction) * 1000;
 				time = (time - p->time) * 0.001;
 
-				VectorSet(vel, p->vel[0], p->vel[1], p->vel[2] + p->accel[2] * gravity * time);
-				VectorReflect(vel, trace.plane.normal, p->vel);
-				VectorScale(p->vel, p->bounceFactor, p->vel);
+				VectorSet (vel, p->vel[0], p->vel[1], p->vel[2] + p->accel[2] * gravity * time);
+				VectorReflect (vel, trace.plane.normal, p->vel);
+				VectorScale (p->vel, p->bounceFactor, p->vel);
 
 				// Check for stop or slide along the plane
-				if (trace.plane.normal[2] > 0 && p->vel[2] < 1){
-					if (trace.plane.normal[2] == 1){
-						VectorClear(p->vel);
-						VectorClear(p->accel);
+				if (trace.plane.normal[2] > 0 && p->vel[2] < 1)
+				{
+					if (trace.plane.normal[2] == 1)
+					{
+						VectorClear (p->vel);
+						VectorClear (p->accel);
 
 						p->flags &= ~PARTICLE_BOUNCE;
 					}
-					else {
+					else
+					{
 						// FIXME: check for new plane or free fall
-						dot = DotProduct(p->vel, trace.plane.normal);
-						VectorMA(p->vel, -dot, trace.plane.normal, p->vel);
+						dot = DotProduct (p->vel, trace.plane.normal);
+						VectorMA (p->vel, -dot, trace.plane.normal, p->vel);
 
-						dot = DotProduct(p->accel, trace.plane.normal);
-						VectorMA(p->accel, -dot, trace.plane.normal, p->accel);
+						dot = DotProduct (p->accel, trace.plane.normal);
+						VectorMA (p->accel, -dot, trace.plane.normal, p->accel);
 					}
 				}
 
@@ -352,8 +516,8 @@ void CL_AddParticles (void)
 				p->time = cl.time;
 				VectorCopy(org, p->org);
 				VectorCopy(color, p->color);
-				p->alpha = alpha;
-				p->radius = radius;
+				p->color[3] = color[3];
+				p->size = size;
 
 				// Don't stretch
 				p->flags &= ~PARTICLE_STRETCH;
@@ -364,36 +528,55 @@ void CL_AddParticles (void)
 		}
 
 		// Save current origin if needed
-		if (p->flags & (PARTICLE_BOUNCE | PARTICLE_STRETCH)){
-			VectorCopy(p->lastOrg, org2);
-			VectorCopy(org, p->lastOrg);	// FIXME: pause
+		if (p->flags & (PARTICLE_BOUNCE | PARTICLE_STRETCH))
+		{
+			VectorCopy (p->lastOrg, org2);
+			VectorCopy (org, p->lastOrg);	// FIXME: pause
 		}
 
-		if (p->flags & PARTICLE_VERTEXLIGHT){
-			// Vertex lit particle
-			R_LightForPoint(org, ambientLight);
+		// Vertex lit particle
+		if (p->flags & PARTICLE_VERTEXLIGHT)
+		{
+			R_LightForPoint (org, ambientLight);
 
-			VectorMultiply(color, ambientLight, color);
+			VectorMultiply (color, ambientLight, color);
 		}
 
 		// Clamp color and alpha and convert to byte
 		modulate[0] = 255 * Clamp(color[0], 0.0, 1.0);
 		modulate[1] = 255 * Clamp(color[1], 0.0, 1.0);
 		modulate[2] = 255 * Clamp(color[2], 0.0, 1.0);
-		modulate[3] = 255 * Clamp(alpha, 0.0, 1.0);
+		modulate[3] = 255 * Clamp(color[3], 0.0, 1.0);
 
-		if (p->flags & PARTICLE_INSTANT){
-			// Instant particle
+		// Instant particle
+		if (p->flags & PARTICLE_INSTANT)
+		{
 			p->alpha = 0;
 			p->alphaVel = 0;
 		}
 
+		// Kill if particle is instant
+nextParticle:	
+		if (p->colorVel[3] <= PART_INSTANT)
+		{
+			p->color[3] = 0;
+			p->colorVel[3] = 0;
+		}
+
 		// Send the particle to the renderer
-		R_AddParticleToScene(p->shader, org, org2, radius, length, p->rotation, modulate);
+		R_AddParticleToScene (p->shader, org, org2, size, length, p->rotation, modulate);
 	}
 
 	cl_activeParticles = active;
 }
+
+/*
+==============================================================================
+
+	ORIGINAL QUAKE 2 PARTICLES	
+	
+==============================================================================
+*/  
 
 /*
  ==================
@@ -431,9 +614,199 @@ void CL_BlasterTrail (const vec3_t start, const vec3_t end, float r, float g, fl
 			2.4 + (1.2 * crand ()),				   -2.4f + (1.2f * crand ()),
 			0,
 			0,
-			1,                                     0);
+			0,
+			1,                                     0,
+			NULL,								   NULL,								   NULL);
 	}
 }
+
+/*
+ ==================
+ CL_RocketTrail
+ ==================
+*/
+void CL_RocketTrail (const vec3_t start, const vec3_t end)
+{
+	vec3_t		move, vec;
+	float		len, dist;
+	int			flags = 0;
+
+	if (!cl_particles->integer)
+		return;
+
+	// Check for water
+	if (CL_PointContents (end, -1) & MASK_WATER)
+	{
+		// Found it, so do a bubble trail
+		if (CL_PointContents (start, -1) & MASK_WATER)
+			CL_BubbleTrail (start, end, 8, 3);
+
+		return;
+	}
+
+	// Fire
+	Vec3Copy (start, move);
+	Vec3Subtract (end, start, vec);
+	len = VectorNormalize (vec);
+
+	dist = 1.0f;
+	Vec3Scale (vec, dist, vec);
+
+	for (; len > 0; Vec3Add (move, vec, move))
+	{
+		len -= dist;
+
+		CL_SpawnParticle (
+			move[0] + crand (),					   move[1] + crand (),					   move[2] + crand (),
+			0,					                   0,				                       0,
+			crand () * 5,						   crand () * 5,					       crand () * 5 + (25 + crand () * 5), 
+			0,					                   0,				                       0,
+			0,					                   0,				                       0,
+			0,					                   0,				                       0,
+			PT_ENERGY,
+			1.0f,					               -1.0f / (0.3f + frand () * 0.2f), 
+			2.4 + (1.2 * crand ()),				   -2.4f + (1.2f * crand ()),
+			0,
+			0,
+			frand () * 360,
+			1,                                     0,
+			NULL,								   NULL,								   NULL);
+
+#ifdef JUST_CRAP
+		p->shader = cl.media.flameParticleShader;
+
+		p->color[0] = 1.0;
+		p->color[1] = 1.0;
+		p->color[2] = 1.0;
+		p->colorVel[0] = 0;
+		p->colorVel[1] = 0;
+		p->colorVel[2] = 0;
+		p->alpha = 1.0;
+		p->alphaVel = -2.0 / (0.2 + frand() * 0.1);
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = -6 + (3 * crand());
+#endif
+	}
+	
+	// Smoke
+	flags = 0;
+
+	if (cl_particleVertexLight->integer)
+		flags |= PARTICLE_VERTEXLIGHT;
+
+	Vec3Copy (start, move);
+	Vec3Subtract (end, start, vec);
+	len = VectorNormalize (vec);
+
+	dist = 10.0f;
+	Vec3Scale (vec, dist, vec);
+
+	for (; len > 0; Vec3Add (move, vec, move))
+	{
+		len -= dist;
+
+		CL_SpawnParticle (
+			move[0] + crand (),					   move[1] + crand (),					   move[2] + crand (),
+			0,					                   0,				                       0,
+			crand () * 5,						   crand () * 5,					       crand () * 5 + (25 + crand () * 5), 
+			0,					                   0,				                       0,
+			0,					                   0,				                       0,
+			0,					                   0,				                       0,
+			PT_ENERGY,
+			1.0f,					               -1.0f / (0.3f + frand () * 0.2f), 
+			2.4 + (1.2 * crand ()),				   -2.4f + (1.2f * crand ()),
+			flags,
+			0,
+			frand () * 360,
+			1,                                     0,
+			NULL,								   NULL,								   NULL);
+
+#ifdef JUST_CRAP
+		p->shader = cl.media.smokeParticleShader;
+
+
+		p->color[0] = 0;
+		p->color[1] = 0;
+		p->color[2] = 0;
+		p->colorVel[0] = 0.75;
+		p->colorVel[1] = 0.75;
+		p->colorVel[2] = 0.75;
+		p->alpha = 0.5;
+		p->alphaVel = -(0.2 + frand() * 0.1);
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = 15 + (7.5 * crand());
+		p->length = 1;
+		p->lengthVel = 0;
+#endif
+	}
+}
+
+/*
+ ==================
+ CL_BlasterParticles
+ ==================
+*/
+void CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, float b)
+{
+	int     flags;
+	int		i;
+
+	if (!cl_particles->integer)
+		return;
+
+	// Sparks
+	flags = 0;
+
+	if (cl_particleBounce->integer)
+		flags |= PARTICLE_BOUNCE;
+	if (cl_particleFriction->integer)
+		flags |= PARTICLE_FRICTION;
+
+	for (i = 0; i < 40; i++)
+	{
+		CL_SpawnParticle (
+			org[0] + dir[0] * 3 + crand (),		   org[1] + dir[1] * 3 + crand (),		   org[2] + dir[2] * 3 + crand (),
+			0,					                   0,				                       0,
+			dir[0] * 25 + crand () * 20,		   dir[1] * 25 + crand () * 20,			   dir[2] * 25 + crand () * 20,
+			0,					                   0,				                       -120 + (40 * crand ()),
+			r,						               g,				                       b,
+			0,					                   0,				                       0,
+			PT_ENERGY,
+			1.0f,					               -0.25f / (0.3f + frand () * 0.2f), 
+			2.4f + (1.2f * crand ()),			   -1.2f + (0.6f * crand ()),
+			flags,
+			0.7f,
+			0,
+			1,                                     0,
+			NULL,								   NULL,								   NULL);
+	}
+
+	// Dont do steam underwater
+	if (CL_PointContents(org, -1) & MASK_WATER)
+		return;
+
+	// Steam
+	for (i = 0; i < 3; i++)
+	{
+		CL_SpawnParticle (
+			org[0] + dir[0] * 5 + crand (),		   org[1] + dir[1] * 5 + crand (),		   org[2] + dir[2] * 5 + crand (),
+			0,					                   0,				                       0,
+			crand () * 2.5f,		               crand () * 2.5f,			               crand () * 2.5f + (25 + crand () * 5),
+			0,					                   0,				                       0,
+			r,						               g,				                       b,
+			0,					                   0,				                       0,
+			PT_ENERGY,
+			0.5f,					               -(0.4f + frand () * 0.2f), 
+			3 + (1.5f * crand ()),				   5 + (2.5f * crand ()),
+			0,
+			0,
+			frand () * 360,
+			1,                                     0,
+			NULL,								   NULL,								   NULL);
+	}
+}
+
+// ===========================================================================
 
 /*
  =================
@@ -491,126 +864,8 @@ void CL_GrenadeTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 3 + (1.5 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = rand() % 360;
-
-		VectorAdd(move, vec, move);
-	}
-}
-
-/*
- =================
- CL_RocketTrail
- =================
-*/
-void CL_RocketTrail (const vec3_t start, const vec3_t end){
-
-	cparticle_t	*p;
-	int			flags = 0;
-	vec3_t		move, vec;
-	float		len, dist;
-
-	if (!cl_particles->integer)
-		return;
-
-	if (CL_PointContents(end, -1) & MASK_WATER){
-		if (CL_PointContents(start, -1) & MASK_WATER)
-			CL_BubbleTrail(start, end, 8, 3);
-
-		return;
-	}
-
-	// Flames
-	VectorCopy(start, move);
-	VectorSubtract(end, start, vec);
-	len = VectorNormalize(vec);
-
-	dist = 1;
-	VectorScale(vec, dist, vec);
-
-	while (len > 0){
-		len -= dist;
-
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.flameParticleShader;
-		p->time = cl.time;
-		p->flags = 0;
-
-		p->org[0] = move[0] + crand();
-		p->org[1] = move[1] + crand();
-		p->org[2] = move[2] + crand();
-		p->vel[0] = crand() * 5;
-		p->vel[1] = crand() * 5;
-		p->vel[2] = crand() * 5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = 1.0;
-		p->color[1] = 1.0;
-		p->color[2] = 1.0;
-		p->colorVel[0] = 0;
-		p->colorVel[1] = 0;
-		p->colorVel[2] = 0;
-		p->alpha = 1.0;
-		p->alphaVel = -2.0 / (0.2 + frand() * 0.1);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = -6 + (3 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = rand() % 360;
-
-		VectorAdd(move, vec, move);
-	}
-	
-	// Smoke
-	flags = 0;
-
-	if (cl_particleVertexLight->integer)
-		flags |= PARTICLE_VERTEXLIGHT;
-
-	VectorCopy(start, move);
-	VectorSubtract(end, start, vec);
-	len = VectorNormalize(vec);
-
-	dist = 10;
-	VectorScale(vec, dist, vec);
-
-	while (len > 0){
-		len -= dist;
-
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.smokeParticleShader;
-		p->time = cl.time;
-		p->flags = flags;
-
-		p->org[0] = move[0] + crand();
-		p->org[1] = move[1] + crand();
-		p->org[2] = move[2] + crand();
-		p->vel[0] = crand() * 5;
-		p->vel[1] = crand() * 5;
-		p->vel[2] = crand() * 5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = 0;
-		p->color[1] = 0;
-		p->color[2] = 0;
-		p->colorVel[0] = 0.75;
-		p->colorVel[1] = 0.75;
-		p->colorVel[2] = 0.75;
-		p->alpha = 0.5;
-		p->alphaVel = -(0.2 + frand() * 0.1);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 15 + (7.5 * crand());
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = 3 + (1.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -678,8 +933,8 @@ void CL_RailTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 0.5;
 		p->alphaVel = -0.5 / (1.0 + frand() * 0.2);
-		p->radius = 1.5 + (0.5 * crand());
-		p->radiusVel = 3 + (1.5 * crand());
+		p->size = 1.5 + (0.5 * crand());
+		p->sizeVel = 3 + (1.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -728,8 +983,8 @@ void CL_RailTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0;
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -800,8 +1055,8 @@ void CL_BFGTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0 - Distance(org, p->org) / 90.0;
 		p->alphaVel = 0;
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -848,8 +1103,8 @@ void CL_BFGTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 25 + (5 * crand());
-		p->radiusVel = 25 + (5 * crand());
+		p->size = 25 + (5 * crand());
+		p->sizeVel = 25 + (5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -926,8 +1181,8 @@ void CL_HeatBeamTrail (const vec3_t start, const vec3_t forward){
 			p->colorVel[2] = 0;
 			p->alpha = 0.5;
 			p->alphaVel = 0;
-			p->radius = 1.5;
-			p->radiusVel = 0;
+			p->size = 1.5;
+			p->sizeVel = 0;
 			p->length = 1;
 			p->lengthVel = 0;
 			p->rotation = 0;
@@ -992,8 +1247,8 @@ void CL_TrackerTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -2.0;
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1051,8 +1306,8 @@ void CL_TagTrail (const vec3_t start, const vec3_t end){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (0.8 + frand() * 0.2);
-		p->radius = 1.5;
-		p->radiusVel = 0;
+		p->size = 1.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1109,8 +1364,8 @@ void CL_BubbleTrail (const vec3_t start, const vec3_t end, float dist, float rad
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = radius + ((radius * 0.5) * crand());
-		p->radiusVel = 0;
+		p->size = radius + ((radius * 0.5) * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1168,109 +1423,13 @@ void CL_FlagTrail (const vec3_t start, const vec3_t end, float r, float g, float
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (0.8 + frand() * 0.2);
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
 
 		VectorAdd(move, vec, move);
-	}
-}
-
-/*
- =================
- CL_BlasterParticles
- =================
-*/
-void CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, float b){
-
-	cparticle_t	*p;
-	int			flags;
-	int			i;
-
-	if (!cl_particles->integer)
-		return;
-
-	// Sparks
-	flags = 0;
-
-	if (cl_particleBounce->integer)
-		flags |= PARTICLE_BOUNCE;
-	if (cl_particleFriction->integer)
-		flags |= PARTICLE_FRICTION;
-
-	for (i = 0; i < 40; i++){
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.energyParticleShader;
-		p->time = cl.time;
-		p->flags = flags;
-
-		p->org[0] = org[0] + dir[0] * 3 + crand();
-		p->org[1] = org[1] + dir[1] * 3 + crand();
-		p->org[2] = org[2] + dir[2] * 3 + crand();
-		p->vel[0] = dir[0] * 25 + crand() * 20;
-		p->vel[1] = dir[1] * 25 + crand() * 20;
-		p->vel[2] = dir[2] * 50 + crand() * 20;
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = -120 + (40 * crand());
-		p->color[0] = r;
-		p->color[1] = g;
-		p->color[2] = b;
-		p->colorVel[0] = 0;
-		p->colorVel[1] = 0;
-		p->colorVel[2] = 0;
-		p->alpha = 1.0;
-		p->alphaVel = -0.25 / (0.3 + frand() * 0.2);
-		p->radius = 2.4 + (1.2 * crand());
-		p->radiusVel = -1.2 + (0.6 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = 0;
-		p->bounceFactor = 0.7;
-
-		VectorCopy(p->org, p->lastOrg);
-	}
-
-	if (CL_PointContents(org, -1) & MASK_WATER)
-		return;
-
-	// Steam
-	for (i = 0; i < 3; i++){
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.steamParticleShader;
-		p->time = cl.time;
-		p->flags = 0;
-
-		p->org[0] = org[0] + dir[0] * 5 + crand();
-		p->org[1] = org[1] + dir[1] * 5 + crand();
-		p->org[2] = org[2] + dir[2] * 5 + crand();
-		p->vel[0] = crand() * 2.5;
-		p->vel[1] = crand() * 2.5;
-		p->vel[2] = crand() * 2.5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = r;
-		p->color[1] = g;
-		p->color[2] = b;
-		p->colorVel[0] = 0;
-		p->colorVel[1] = 0;
-		p->colorVel[2] = 0;
-		p->alpha = 0.5;
-		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 5 + (2.5 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = rand() % 360;
 	}
 }
 
@@ -1329,8 +1488,8 @@ void CL_BulletParticles (const vec3_t org, const vec3_t dir){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -8.0;
-		p->radius = 0.4 + (0.2 * crand());
-		p->radiusVel = 0;
+		p->size = 0.4 + (0.2 * crand());
+		p->sizeVel = 0;
 		p->length = 8 + (4 * crand());
 		p->lengthVel = 8 + (4 * crand());
 		p->rotation = 0;
@@ -1371,8 +1530,8 @@ void CL_BulletParticles (const vec3_t org, const vec3_t dir){
 		p->colorVel[2] = 0.2;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 5 + (2.5 * crand());
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = 5 + (2.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -1427,8 +1586,8 @@ void CL_ExplosionParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -3.0;
-		p->radius = 0.5 + (0.2 * crand());
-		p->radiusVel = 0;
+		p->size = 0.5 + (0.2 * crand());
+		p->sizeVel = 0;
 		p->length = 8 + (4 * crand());
 		p->lengthVel = 8 + (4 * crand());
 		p->rotation = 0;
@@ -1469,8 +1628,8 @@ void CL_ExplosionParticles (const vec3_t org){
 		p->colorVel[2] = 0.75;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.1 + frand() * 0.1);
-		p->radius = 30 + (15 * crand());
-		p->radiusVel = 15 + (7.5 * crand());
+		p->size = 30 + (15 * crand());
+		p->sizeVel = 15 + (7.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -1525,8 +1684,8 @@ void CL_BFGExplosionParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -0.8 / (0.5 + frand() * 0.3);
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1565,8 +1724,8 @@ void CL_BFGExplosionParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.1 + frand() * 0.1);
-		p->radius = 50 + (25 * crand());
-		p->radiusVel = 15 + (7.5 * crand());
+		p->size = 50 + (25 * crand());
+		p->sizeVel = 15 + (7.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -1620,8 +1779,8 @@ void CL_TrackerExplosionParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -0.4 / (0.6 + frand() * 0.2);
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1673,8 +1832,8 @@ void CL_SmokePuffParticles (const vec3_t org, float radius, int count){
 		p->colorVel[2] = 0.75;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = radius + ((radius * 0.5) * crand());
-		p->radiusVel = (radius * 2) + ((radius * 4) * crand());
+		p->size = radius + ((radius * 0.5) * crand());
+		p->sizeVel = (radius * 2) + ((radius * 4) * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -1720,8 +1879,8 @@ void CL_BubbleParticles (const vec3_t org, int count, float magnitude){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 1 + (0.5 * crand());
-		p->radiusVel = 0;
+		p->size = 1 + (0.5 * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1781,8 +1940,8 @@ void CL_SparkParticles (const vec3_t org, const vec3_t dir, int count){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.5;
-		p->radius = 0.4 + (0.2 * crand());
-		p->radiusVel = 0;
+		p->size = 0.4 + (0.2 * crand());
+		p->sizeVel = 0;
 		p->length = 8 + (4 * crand());
 		p->lengthVel = 8 + (4 * crand());
 		p->rotation = 0;
@@ -1823,8 +1982,8 @@ void CL_SparkParticles (const vec3_t org, const vec3_t dir, int count){
 		p->colorVel[2] = 0.2;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 5 + (2.5 * crand());
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = 5 + (2.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -1885,8 +2044,8 @@ void CL_DamageSparkParticles (const vec3_t org, const vec3_t dir, int count, int
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -(0.75 + frand());
-		p->radius = 0.4 + (0.2 * crand());
-		p->radiusVel = 0;
+		p->size = 0.4 + (0.2 * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1948,8 +2107,8 @@ void CL_LaserSparkParticles (const vec3_t org, const vec3_t dir, int count, int 
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.5;
-		p->radius = 0.4 + (0.2 * crand());
-		p->radiusVel = 0;
+		p->size = 0.4 + (0.2 * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -1998,8 +2157,8 @@ void CL_SplashParticles (const vec3_t org, const vec3_t dir, int count, float ma
 		p->colorVel[2] = 0;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.25 + frand() * 0.25);
-		p->radius = 0.5 + (0.25 * crand());
-		p->radiusVel = 0;
+		p->size = 0.5 + (0.25 * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -2045,8 +2204,8 @@ void CL_LavaSteamParticles (const vec3_t org, const vec3_t dir, int count){
 		p->colorVel[2] = 0;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->radius = 1.5 + (0.75 * crand());
-		p->radiusVel = 5 + (2.5 * crand());
+		p->size = 1.5 + (0.75 * crand());
+		p->sizeVel = 5 + (2.5 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -2113,8 +2272,8 @@ void CL_FlyParticles (const vec3_t org, int count){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = 0;
-		p->radius = 1.0;
-		p->radiusVel = 0;
+		p->size = 1.0;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2171,8 +2330,8 @@ void CL_TeleportParticles (const vec3_t org){
 				p->colorVel[2] = 0;
 				p->alpha = 1.0;
 				p->alphaVel = -1.0 / (0.3 + (rand() & 7) * 0.02);
-				p->radius = 2;
-				p->radiusVel = 0;
+				p->size = 2;
+				p->sizeVel = 0;
 				p->length = 1;
 				p->lengthVel = 0;
 				p->rotation = 0;
@@ -2229,8 +2388,8 @@ void CL_BigTeleportParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -0.3 / (0.5 + frand() * 0.3);
-		p->radius = 2;
-		p->radiusVel = 0;
+		p->size = 2;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2276,8 +2435,8 @@ void CL_TeleporterParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -0.5;
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 0;
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2337,8 +2496,8 @@ void CL_TrapParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (0.3 + frand() * 0.2);
-		p->radius = 3 + (1.5 * crand());
-		p->radiusVel = 0;
+		p->size = 3 + (1.5 * crand());
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2379,8 +2538,8 @@ void CL_TrapParticles (const vec3_t org){
 				p->colorVel[2] = 0;
 				p->alpha = 1.0;
 				p->alphaVel = -1.0 / (0.3 + (rand() & 7) * 0.02);
-				p->radius = 3 + (1.5 * crand());
-				p->radiusVel = 0;
+				p->size = 3 + (1.5 * crand());
+				p->sizeVel = 0;
 				p->length = 1;
 				p->lengthVel = 0;
 				p->rotation = 0;
@@ -2428,8 +2587,8 @@ void CL_LogParticles (const vec3_t org, float r, float g, float b){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (1.0 + frand() * 0.3);
-		p->radius = 2;
-		p->radiusVel = 0;
+		p->size = 2;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2475,8 +2634,8 @@ void CL_ItemRespawnParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (1.0 + frand() * 0.3);
-		p->radius = 2;
-		p->radiusVel = 0;
+		p->size = 2;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2540,8 +2699,8 @@ void CL_TrackerShellParticles (const vec3_t org){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = 0;
-		p->radius = 2.5;
-		p->radiusVel = 0;
+		p->size = 2.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2593,8 +2752,8 @@ void CL_NukeSmokeParticles (const vec3_t org){
 		p->colorVel[2] = 0.75;
 		p->alpha = 0.5;
 		p->alphaVel = -(0.1 + frand() * 0.1);
-		p->radius = 60 + (30 * crand());
-		p->radiusVel = 30 + (15 * crand());
+		p->size = 60 + (30 * crand());
+		p->sizeVel = 30 + (15 * crand());
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;
@@ -2650,8 +2809,8 @@ void CL_WeldingSparkParticles (const vec3_t org, const vec3_t dir, int count, in
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (0.5 + frand() * 0.3);
-		p->radius = 1.5;
-		p->radiusVel = 0;
+		p->size = 1.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2708,8 +2867,8 @@ void CL_TunnelSparkParticles (const vec3_t org, const vec3_t dir, int count, int
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (0.5 + frand() * 0.3);
-		p->radius = 1.5;
-		p->radiusVel = 0;
+		p->size = 1.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2768,8 +2927,8 @@ void CL_ForceWallParticles (const vec3_t start, const vec3_t end, int color){
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (3.0 + frand() * 0.5);
-		p->radius = 1.5;
-		p->radiusVel = 0;
+		p->size = 1.5;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = 0;
@@ -2827,8 +2986,8 @@ void CL_SteamParticles (const vec3_t org, const vec3_t dir, int count, int color
 		p->colorVel[2] = 0;
 		p->alpha = 1.0;
 		p->alphaVel = -1.0 / (0.5 + frand() * 0.3);
-		p->radius = 2;
-		p->radiusVel = 0;
+		p->size = 2;
+		p->sizeVel = 0;
 		p->length = 1;
 		p->lengthVel = 0;
 		p->rotation = rand() % 360;

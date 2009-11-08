@@ -189,6 +189,47 @@ static qboolean R_ParseGeneralSurfaceParm (shader_t *shader, char **script){
 }
 
 /*
+ ==================
+ R_ParseGeneralSurfaceType
+
+ - Mine!
+ ==================
+*/
+static qboolean R_ParseGeneralSurfaceType (shader_t *shader, char **script)
+{
+	char	*tok;
+
+	if (shader->shaderType != SHADER_BSP)
+	{
+		Com_Printf (S_COLOR_YELLOW "WARNING: 'surfaceParm' not allowed in material '%s'\n", shader->name);
+		return false;
+	}
+
+	// Parse the key
+	tok = Com_ParseExt(script, false);
+	if (!tok[0])
+	{
+		// Check for any errors
+		Com_Printf (S_COLOR_YELLOW "WARNING: missing parameters for 'surfaceParm' in shader '%s'\n", shader->name);
+		return false;
+	}
+
+	// Check for keyword
+	if (!Q_stricmp(tok, "metal"))
+		shader->surfaceType |= SURFACE_TYPE_METAL;
+	else 
+	{
+		// Check for any errors
+		Com_Printf (S_COLOR_YELLOW "WARNING: unknown 'surfaceType' parameter '%s' in material '%s'\n", tok, shader->name);
+		return false;
+	}
+
+	shader->flags |= MATERIAL_SURFACE_TYPE;
+
+	return true;
+}
+
+/*
  =================
  R_ParseGeneralNoMipmaps
  =================
@@ -2391,6 +2432,7 @@ typedef struct {
 
 static shaderGeneralCmd_t	r_shaderGeneralCmds[] = {
 	{"surfaceParm",				R_ParseGeneralSurfaceParm},
+	{"surfaceType",				R_ParseGeneralSurfaceType}, // Mine
 	{"noMipmaps",				R_ParseGeneralNoMipmaps},
 	{"noPicmip",				R_ParseGeneralNoPicmip},
 	{"noCompress",				R_ParseGeneralNoCompress},

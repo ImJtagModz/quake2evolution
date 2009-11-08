@@ -222,5 +222,11 @@ void			R_EndFrame (void);
 void			R_Init (qboolean all);
 void			R_Shutdown (qboolean all);
 
+// Mine! - Material surface types
+enum {
+    SURFACE_TYPE_METAL			    = BIT(0),
+
+    MATERIAL_SURFACE_TYPE			= BIT(1),
+};
 
 #endif // __REFRESH_H__

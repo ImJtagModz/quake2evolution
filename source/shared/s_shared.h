@@ -140,7 +140,11 @@ typedef unsigned char 		byte;
 typedef enum {false, true}	qboolean;
 
 #ifndef NULL
-#define NULL ((void *)0)
+# define NULL ((void *)0)
+#endif
+
+#ifndef BIT
+# define BIT(x) (1<<(x))
 #endif
 
 // Angle indexes
