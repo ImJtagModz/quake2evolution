@@ -26,4 +26,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		AMDCaProjectFile = D:\Quake2EvolutionSource\trunk\source\CodeAnalyst\evolution.caw
+	EndGlobalSection
 EndGlobal

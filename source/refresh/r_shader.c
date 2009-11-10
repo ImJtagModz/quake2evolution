@@ -2417,6 +2417,22 @@ static qboolean R_ParseStageAlphaGen (shader_t *shader, shaderStage_t *stage, ch
 	return true;
 }
 
+/*
+ ==================
+ R_ParseStageMaskColor
+
+ - Mine!
+ ==================
+*/
+static qboolean R_ParseStageMaskColor (shader_t *shader, shaderStage_t *stage, char **script)
+{
+	stage->maskRed = true;
+	stage->maskGreen = true;
+	stage->maskBlue = true;
+
+	return true;
+}
+
 
 // =====================================================================
 
@@ -2473,6 +2489,7 @@ static shaderStageCmd_t		r_shaderStageCmds[] = {
 	{"detail",					R_ParseStageDetail},
 	{"rgbGen",					R_ParseStageRgbGen},
 	{"alphaGen",				R_ParseStageAlphaGen},
+	{"maskColor",				R_ParseStageMaskColor}, // Mine
 	{NULL,						NULL}
 };
 

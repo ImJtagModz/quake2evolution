@@ -72,9 +72,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:libcmt"
 				AdditionalDependencies="winmm.lib wsock32.lib win32\lib\zlibstat.lib win32\lib\jpeg6b.lib win32\lib\ogg_static.lib win32\lib\vorbisfile_static.lib"
 				OutputFile="D:\Quake2Evolution/evolution.exe"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\debug/q2e.pdb"
@@ -311,7 +312,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="client\cl_effects.c"
+				RelativePath=".\client\cl_effects2.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2000,10 +2001,6 @@
 				>
 			</File>
 			<File
-				RelativePath="refresh\r_local.h"
-				>
-			</File>
-			<File
 				RelativePath="client\refresh.h"
 				>
 			</File>
@@ -2085,6 +2082,10 @@
 			<Filter
 				Name="Client"
 				>
+				<File
+					RelativePath=".\client\cl_effects.c"
+					>
+				</File>
 				<File
 					RelativePath=".\client\cl_local.h"
 					>
@@ -2169,6 +2170,30 @@
 					RelativePath=".\shared\s_surfaceflags.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="Renderer"
+				>
+				<File
+					RelativePath="refresh\r_local.h"
+					>
+				</File>
+				<File
+					RelativePath=".\refresh\rf_cull.c"
+					>
+				</File>
+				<File
+					RelativePath=".\refresh\rf_register.c"
+					>
+				</File>
+				<File
+					RelativePath=".\refresh\rf_register.h"
+					>
+				</File>
+				<Filter
+					Name="Backend"
+					>
+				</Filter>
 			</Filter>
 		</Filter>
 	</Files>

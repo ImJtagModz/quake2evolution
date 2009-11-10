@@ -170,6 +170,34 @@ static trace_t CL_PMTrace (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end){
 }
 
 /*
+ ==================
+ CL_PMTraceDecal
+
+ - Special trace for decal placment
+ ==================
+*/
+void CL_PMTraceDecal (trace_t *out, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, qboolean entities, qboolean bModels)
+{
+	if (!out)
+		return;
+
+	if (!mins)
+		mins = vec3_origin;
+
+	if (!maxs)
+		maxs = vec3_origin;
+
+	// Check against world
+	*out = CM_BoxTrace (start, end, mins, maxs, 0, MASK_PLAYERSOLID);
+	if (out->fraction < 1.0f)
+		out->ent = (struct edict_s *)1;
+
+	// Check all other solid models
+	if (entities || bModels)
+		CL_Trace (start, mins, maxs, end, cl.clientNum+1, entities, true, out);
+}
+
+/*
  =================
  CL_PMPointContents
  =================

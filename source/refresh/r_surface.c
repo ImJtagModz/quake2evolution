@@ -24,9 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 
-
-#define BACKFACE_EPSILON	0.01
-
 model_t		*r_worldModel;
 entity_t	*r_worldEntity;
 
@@ -85,44 +82,6 @@ void R_DrawSurface (void){
 			numVertex++;
 		}
 	}
-}
-
-/*
- =================
- R_CullSurface
- =================
-*/
-static qboolean R_CullSurface (surface_t *surf, const vec3_t origin, int clipFlags){
-
-	cplane_t	*plane;
-	float		dist;
-
-	if (r_noCull->integer)
-		return false;
-
-	// Find which side of the node we are on
-	plane = surf->plane;
-	if (plane->type < 3)
-		dist = origin[plane->type] - plane->dist;
-	else
-		dist = DotProduct(origin, plane->normal) - plane->dist;
-
-	if (!(surf->flags & SURF_PLANEBACK)){
-		if (dist <= BACKFACE_EPSILON)
-			return true;	// Wrong side
-	}
-	else {
-		if (dist >= -BACKFACE_EPSILON)
-			return true;	// Wrong side
-	}
-
-	// Cull
-	if (clipFlags){
-		if (R_CullBox(surf->mins, surf->maxs, clipFlags))
-			return true;
-	}
-
-	return false;
 }
 
 /*

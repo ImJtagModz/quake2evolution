@@ -1,5 +1,7 @@
 /*
+===========================================================================
 Copyright (C) 1997-2001 Id Software, Inc.
+Copyright (C) 2009-2010 Quake 2 Evolution.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -15,432 +17,252 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
+===========================================================================
 */
 
-
-// cl_effects.c -- client side effects parsing and management
-
+//
+// cl_media.c
+//
 
 #include "cl_local.h"
 
-
 /*
- =======================================================================
+==============================================================================
 
- LIGHT STYLE MANAGEMENT
-
- =======================================================================
-*/
-
-typedef struct {
-	int		length;
-	float	map[MAX_QPATH];
-	vec3_t	rgb;
-} clightStyle_t;
-
-static clightStyle_t	cl_lightStyles[MAX_LIGHTSTYLES];
-static int				cl_lastOfs;
-
-
-/*
- =================
- CL_ClearLightStyles
- =================
-*/
-void CL_ClearLightStyles (void){
-
-	memset(cl_lightStyles, 0, sizeof(cl_lightStyles));
-	cl_lastOfs = -1;
-}
-
-/*
- =================
- CL_RunLightStyles
- =================
-*/
-void CL_RunLightStyles (void){
-
-	clightStyle_t	*ls;
-	int				i, ofs;
-
-	ofs = cl.time / 100;
-	if (ofs == cl_lastOfs)
-		return;
-	cl_lastOfs = ofs;
-
-	for (i = 0, ls = cl_lightStyles; i < MAX_LIGHTSTYLES; i++, ls++){
-		if (!ls->length){
-			ls->rgb[0] = ls->rgb[1] = ls->rgb[2] = 1.0;
-			continue;
-		}
-
-		if (ls->length == 1)
-			ls->rgb[0] = ls->rgb[1] = ls->rgb[2] = ls->map[0];
-		else
-			ls->rgb[0] = ls->rgb[1] = ls->rgb[2] = ls->map[ofs % ls->length];
-	}
-}
-
-/*
- =================
- CL_AddLightStyles
- =================
-*/
-void CL_AddLightStyles (void){
-
-	clightStyle_t	*ls;
-	int				i;
-
-	for (i = 0, ls = cl_lightStyles; i < MAX_LIGHTSTYLES; i++, ls++)
-		R_SetLightStyle(i, ls->rgb[0], ls->rgb[1], ls->rgb[2]);
-}
-
-/*
- =================
- CL_SetLightStyle
- =================
-*/
-void CL_SetLightStyle (int style){
-
-	char	*s;
-	int		i, len;
-
-	s = cl.configStrings[CS_LIGHTS + style];
-
-	len = strlen(s);
-	if (len >= MAX_QPATH)
-		Com_Error(ERR_DROP, "CL_SetLightStyle: style length = %i", len);
-
-	if (style < 0 || style >= MAX_LIGHTSTYLES)
-		Com_Error(ERR_DROP, "CL_SetLightStyle: style = %i", style);
-
-	cl_lightStyles[style].length = len;
-
-	for (i = 0; i < len; i++)
-		cl_lightStyles[style].map[i] = (float)(s[i] - 'a') / (float)('m' - 'a');
-}
-
-
-/*
- =======================================================================
-
- DYNAMIC LIGHT MANAGEMENT
-
- =======================================================================
-*/
-
-typedef struct {
-	qboolean	active;
-	int			start;
-	int			end;
-	vec3_t		origin;
-	float		intensity;
-	vec3_t		color;
-	qboolean	fade;
-} cdlight_t;
-
-static cdlight_t	cl_dynamicLights[MAX_DLIGHTS];
-
-
-/*
- =================
- CL_AllocDynamicLight
- =================
-*/
-static cdlight_t *CL_AllocDynamicLight (void){
-
-	int		i;
-	int		time, index;
-
-	for (i = 0; i < MAX_DLIGHTS; i++){
-		if (!cl_dynamicLights[i].active){
-			memset(&cl_dynamicLights[i], 0, sizeof(cl_dynamicLights[i]));
-			return &cl_dynamicLights[i];
-		}
-	}
-
-	// Find the oldest light
-	time = cl.time;
-	index = 0;
-
-	for (i = 0; i < MAX_DLIGHTS; i++){
-		if (cl_dynamicLights[i].start < time){
-			time = cl_dynamicLights[i].start;
-			index = i;
-		}
-	}
-
-	memset(&cl_dynamicLights[index], 0, sizeof(cl_dynamicLights[index]));
-	return &cl_dynamicLights[index];
-}
-
-/*
- =================
- CL_ClearDynamicLights
- =================
-*/
-void CL_ClearDynamicLights (void){
-
-	memset(cl_dynamicLights, 0, sizeof(cl_dynamicLights));
-}
-
-/*
- =================
- CL_AddDynamicLights
- =================
-*/
-void CL_AddDynamicLights (void){
-
-	int			i;
-	cdlight_t	*dl;
-	float		intensity;
-
-	for (i = 0, dl = cl_dynamicLights; i < MAX_DLIGHTS; i++, dl++){
-		if (!dl->active)
-			continue;
-
-		if (cl.time >= dl->end){
-			dl->active = false;
-			continue;
-		}
-
-		if (!dl->fade)
-			intensity = dl->intensity;
-		else {
-			intensity = (float)(cl.time - dl->start) / (dl->end - dl->start);
-			intensity = dl->intensity * (1.0 - intensity);
-		}
-
-		R_AddLightToScene(dl->origin, intensity, dl->color[0], dl->color[1], dl->color[2]);
-	}
-}
-
-/*
- =================
- CL_DynamicLight
- =================
-*/
-void CL_DynamicLight (const vec3_t org, float intensity, float r, float g, float b, qboolean fade, int duration){
-
-	cdlight_t	*dl;
-
-	dl = CL_AllocDynamicLight();
-	dl->active = true;
-
-	dl->start = cl.time;
-	dl->end = dl->start + duration;
-	VectorCopy(org, dl->origin);
-	dl->intensity = intensity;
-	dl->color[0] = r;
-	dl->color[1] = g;
-	dl->color[2] = b;
-	dl->fade = fade;
-}
-
-
-/*
- =======================================================================
-
- MUZZLE FLASH PARSING
-
- =======================================================================
-*/
-
-
-/*
- =================
- CL_ParsePlayerMuzzleFlash
- =================
-*/
-void CL_ParsePlayerMuzzleFlash (void){
-
-	int			ent;
-	centity_t	*cent;
-	vec3_t		forward, right;
-	int			weapon;
-	float		volume = 1.0;
-	char		name[MAX_QPATH];
-	vec3_t		origin;
-
-	ent = MSG_ReadShort(&net_message);
-	if (ent < 1 || ent >= MAX_EDICTS)
-		Com_Error(ERR_DROP, "CL_ParsePlayerMuzzleFlash: ent = %i", ent);
-
-	weapon = MSG_ReadByte(&net_message);
+	MUZZLE FLASH PARSING	
 	
-	if (weapon & MZ_SILENCED){
+==============================================================================
+*/  
+
+/*
+ ==================
+ CL_ParsePlayerMuzzleFlash
+ ==================
+*/
+void CL_ParsePlayerMuzzleFlash ()
+{
+	centity_t	*cent;
+	vec3_t		origin, forward, right;
+	float		volume = 1.0f;
+	int			weapon;
+	int			ent;
+
+	// Parse it to the server
+	ent = MSG_ReadShort (&net_message);
+	if (ent < 1 || ent >= MAX_EDICTS)
+		Com_Error (ERR_DROP, "CL_ParsePlayerMuzzleFlash: Bad entity, ent = %i", ent);
+
+	weapon = MSG_ReadByte (&net_message);
+	
+	// Silenced weapon
+	if (weapon & MZ_SILENCED)
+	{
 		weapon &= ~MZ_SILENCED;
-		volume = 0.2;
+		volume = 0.2f;
 	}
 
 	cent = &cl.entities[ent];
 
+	// Locate the origin
 	AngleVectors(cent->current.angles, forward, right, NULL);
-
 	origin[0] = cent->current.origin[0] + forward[0] * 18 + right[0] * 16;
 	origin[1] = cent->current.origin[1] + forward[1] * 18 + right[1] * 16;
 	origin[2] = cent->current.origin[2] + forward[2] * 18 + right[2] * 16;
 
+	// Faster to just set CG brass here
 	switch (weapon){
-	case MZ_BLASTER:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/blastf1a.wav"), volume, ATTN_NORM, 0);
-
-		break;
-	case MZ_BLUEHYPERBLASTER:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 0, 1, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/hyprbf1a.wav"), volume, ATTN_NORM, 0);
-
-		break;
-	case MZ_HYPERBLASTER:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/hyprbf1a.wav"), volume, ATTN_NORM, 0);
-
-		break;
-	case MZ_MACHINEGUN:
-		CL_MachinegunEjectBrass(cent, 1, 15, -8, 18);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 0);
-
-		break;
-	case MZ_SHOTGUN:
-		CL_ShotgunEjectBrass(cent, 1, 12, -6, 16);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/shotgf1b.wav"), volume, ATTN_NORM, 0);
-		S_StartSound(NULL, ent, CHAN_AUTO, S_RegisterSound("weapons/shotgr1b.wav"), volume, ATTN_NORM, 100);
-
-		break;
-	case MZ_SSHOTGUN:
-		CL_ShotgunEjectBrass(cent, 2, 8, -8, 16);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/sshotf1b.wav"), volume, ATTN_NORM, 0);
-
-		break;
 	case MZ_CHAINGUN1:
-		CL_MachinegunEjectBrass(cent, 1, 10, -8, 18);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.25, 0, false, 1);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 0);
-
-		break;
 	case MZ_CHAINGUN2:
-		CL_MachinegunEjectBrass(cent, 2, 10, -8, 18);
-		CL_DynamicLight(origin, 255 + (rand()&31), 1, 0.5, 0, false, 1);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 0);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 50);
-
-		break;
 	case MZ_CHAINGUN3:
-		CL_MachinegunEjectBrass(cent, 3, 10, -8, 18);
-		CL_DynamicLight(origin, 250 + (rand()&31), 1, 1, 0, false, 1);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 0);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 33);
-		Q_snprintfz(name, sizeof(name), "weapons/machgf%ib.wav", (rand() % 5) + 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), volume, ATTN_NORM, 66);
-
+		CL_MachinegunEjectBrass (cent, 1, 10, -8, 18);
 		break;
+	}
+
+	switch (weapon){
+	// MZ_BLASTER
+	case MZ_BLASTER:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.blasterFireSfx, volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_BLUEHYPERBLASTER
+	case MZ_BLUEHYPERBLASTER:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 0, 1, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.hyperBlasterFireSfx, volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_HYPERBLASTER
+	case MZ_HYPERBLASTER:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.hyperBlasterFireSfx, volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_MACHINEGUN
+	case MZ_MACHINEGUN:
+		CL_MachinegunEjectBrass (cent, 1, 15, -8, 18);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_SHOTGUN
+	case MZ_SHOTGUN:
+		CL_ShotgunEjectBrass (cent, 1, 12, -6, 16);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.shotgunFireSfx, volume, ATTN_NORM, 0);
+		S_StartSound (NULL, ent, CHAN_AUTO, clMedia.sfx.mz.shotgunReloadSfx, volume, ATTN_NORM, 100);
+		break;
+
+	// MZ_SSHOTGUN
+	case MZ_SSHOTGUN:
+		CL_ShotgunEjectBrass (cent, 2, 8, -8, 16);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.superShotgunFireSfx, volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_CHAINGUN1
+	case MZ_CHAINGUN1:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.25f, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_CHAINGUN2
+	case MZ_CHAINGUN2:
+		CL_DynamicLight (origin, 255 + (rand () & 31), 1, 0.5f, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 0);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 50);
+		break;
+
+	// MZ_CHAINGUN3
+	case MZ_CHAINGUN3:
+		CL_DynamicLight (origin, 250 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 0);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 33);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 66);
+		break;
+
+	// MZ_RAILGUN
 	case MZ_RAILGUN:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0.5, 0.5, 1, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/railgf1a.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0.5f, 0.5f, 1, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.railgunFireSfx, volume, ATTN_NORM, 0);
 		break;
+
+	// MZ_ROCKET
 	case MZ_ROCKET:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0.2, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/rocklf1a.wav"), volume, ATTN_NORM, 0);
-		S_StartSound(NULL, ent, CHAN_AUTO, S_RegisterSound("weapons/rocklr1b.wav"), volume, ATTN_NORM, 100);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0.2f, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.rocketFireSfx, volume, ATTN_NORM, 0);
+		S_StartSound (NULL, ent, CHAN_AUTO, clMedia.sfx.mz.rocketReloadSfx, volume, ATTN_NORM, 100);
 		break;
+
+	// MZ_GRENADE
 	case MZ_GRENADE:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/grenlf1a.wav"), volume, ATTN_NORM, 0);
-		S_StartSound(NULL, ent, CHAN_AUTO, S_RegisterSound("weapons/grenlr1b.wav"), volume, ATTN_NORM, 100);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.grenadeFireSfx, volume, ATTN_NORM, 0);
+		S_StartSound (NULL, ent, CHAN_AUTO, clMedia.sfx.mz.grenadeReloadSfx, volume, ATTN_NORM, 100);
 		break;
+
+	// MZ_BFG
 	case MZ_BFG:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/bfg__f1y.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.bfgFireSfx, volume, ATTN_NORM, 0);
 		break;
+
+	// MZ_LOGIN
 	case MZ_LOGIN:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/grenlf1a.wav"), 1, ATTN_NORM, 0);
-		CL_LogParticles(cent->current.origin, 0, 1, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.grenadeFireSfx, 1, ATTN_NORM, 0);
+		CL_LogParticles (cent->current.origin, 0, 1, 0);
 		break;
+
+	// MZ_LOGOUT
 	case MZ_LOGOUT:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/grenlf1a.wav"), 1, ATTN_NORM, 0);
-		CL_LogParticles(cent->current.origin, 1, 0, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.grenadeFireSfx, 1, ATTN_NORM, 0);
+		CL_LogParticles (cent->current.origin, 1, 0, 0);
 		break;
+
+	// MZ_RESPAWN
+	case MZ_RESPAWN:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.grenadeFireSfx, 1, ATTN_NORM, 0);
+		CL_LogParticles (cent->current.origin, 1, 1, 0);
+		break;
+
+	// MZ_PHALANX
 	case MZ_PHALANX:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0.5, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/plasshot.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0.5f, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.phalanxFireSfx, volume, ATTN_NORM, 0);
 		break;
+
+	// MZ_IONRIPPER
 	case MZ_IONRIPPER:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0.5, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/rippfire.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0.5f, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.ionRipperFireSfx, volume, ATTN_NORM, 0);
 		break;
+			
+	// MZ_ETF_RIFLE
 	case MZ_ETF_RIFLE:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0.9, 0.7, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/nail1.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0.9f, 0.7f, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.etfRifleFireSfx, volume, ATTN_NORM, 0);
 		break;
+
+	// MZ_SHOTGUN2
+	case MZ_SHOTGUN2:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.shotgun2FireSfx, volume, ATTN_NORM, 0);
+		break;
+
+	// MZ_HEATBEAM
 	case MZ_HEATBEAM:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 100);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 100);
 		break;
+
+	// MZ_BLASTER2
 	case MZ_BLASTER2:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/blastf1a.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.blasterFireSfx, volume, ATTN_NORM, 0);
 		break;
+
+	// MZ_TRACKER
 	case MZ_TRACKER:
-		CL_DynamicLight(origin, 200 + (rand()&31), -1, -1, -1, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/disint2.wav"), volume, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), -1, -1, -1, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.trackerFireSfx, volume, ATTN_NORM, 0);
 		break;		
+
+	// MZ_NUKE1
 	case MZ_NUKE1:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0, 0, false, 100);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0, 0, false, 100);
 		break;
+
+	// MZ_NUKE2
 	case MZ_NUKE2:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 100);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 100);
 		break;
+
+	// MZ_NUKE4
 	case MZ_NUKE4:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 0, 1, false, 100);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 0, 1, false, 100);
 		break;
-	case MZ_NUKE8:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 1, 1, false, 100);
 
+	// MZ_NUKE8
+	case MZ_NUKE8:
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 1, 1, false, 100);
 		break;
 	}
 }
 
 /*
- =================
+ ==================
  CL_ParseMonsterMuzzleFlash
- =================
+ ==================
 */
-void CL_ParseMonsterMuzzleFlash (void){
-
-	int			ent;
+void CL_ParseMonsterMuzzleFlash ()
+{
 	centity_t	*cent;
-	vec3_t		forward, right;
+	vec3_t		origin, forward, right, shell;
 	int			flash;
-	char		name[MAX_QPATH];
-	vec3_t		origin;
+	int			ent;
 
+	// Parse it to the server
 	ent = MSG_ReadShort(&net_message);
 	if (ent < 1 || ent >= MAX_EDICTS)
 		Com_Error(ERR_DROP, "CL_ParseMonsterMuzzleFlash: ent = %i", ent);
@@ -449,13 +271,18 @@ void CL_ParseMonsterMuzzleFlash (void){
 
 	cent = &cl.entities[ent];
 
+	// Locate the origin
 	AngleVectors(cent->current.angles, forward, right, NULL);
-	
 	origin[0] = cent->current.origin[0] + forward[0] * monster_flash_offset[flash][0] + right[0] * monster_flash_offset[flash][1];
 	origin[1] = cent->current.origin[1] + forward[1] * monster_flash_offset[flash][0] + right[1] * monster_flash_offset[flash][1];
 	origin[2] = cent->current.origin[2] + forward[2] * monster_flash_offset[flash][0] + right[2] * monster_flash_offset[flash][1] + monster_flash_offset[flash][2];
 	
+	// Locate origin for brass (no need?)
+	VectorMA (origin, -5, forward, shell);
+	VectorMA (origin,  15, forward, origin);
+
 	switch (flash){
+	// MZ2_INFANTRY_MACHINEGUN
 	case MZ2_INFANTRY_MACHINEGUN_1:
 	case MZ2_INFANTRY_MACHINEGUN_2:
 	case MZ2_INFANTRY_MACHINEGUN_3:
@@ -469,12 +296,13 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_INFANTRY_MACHINEGUN_11:
 	case MZ2_INFANTRY_MACHINEGUN_12:
 	case MZ2_INFANTRY_MACHINEGUN_13:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("infantry/infatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.machGunSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_SOLDIER_MACHINEGUN
 	case MZ2_SOLDIER_MACHINEGUN_1:
 	case MZ2_SOLDIER_MACHINEGUN_2:
 	case MZ2_SOLDIER_MACHINEGUN_3:
@@ -483,12 +311,13 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_SOLDIER_MACHINEGUN_6:
 	case MZ2_SOLDIER_MACHINEGUN_7:
 	case MZ2_SOLDIER_MACHINEGUN_8:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("soldier/solatck3.wav"), 1, ATTN_NORM, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand	() & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.soldierMachGunSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_GUNNER_MACHINEGUN
 	case MZ2_GUNNER_MACHINEGUN_1:
 	case MZ2_GUNNER_MACHINEGUN_2:
 	case MZ2_GUNNER_MACHINEGUN_3:
@@ -497,12 +326,13 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_GUNNER_MACHINEGUN_6:
 	case MZ2_GUNNER_MACHINEGUN_7:
 	case MZ2_GUNNER_MACHINEGUN_8:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("gunner/gunatck2.wav"), 1, ATTN_NORM, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.gunnerMachGunSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_ACTOR_MACHINEGUN, MZ2_SUPERTANK_MACHINEGUN, MZ2_TURRET_MACHINEGUN 
 	case MZ2_ACTOR_MACHINEGUN_1:
 	case MZ2_SUPERTANK_MACHINEGUN_1:
 	case MZ2_SUPERTANK_MACHINEGUN_2:
@@ -511,12 +341,13 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_SUPERTANK_MACHINEGUN_5:
 	case MZ2_SUPERTANK_MACHINEGUN_6:
 	case MZ2_TURRET_MACHINEGUN:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("infantry/infatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.machGunSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_BOSS2_MACHINEGUN, MZ2_CARRIER_MACHINEGUN
 	case MZ2_BOSS2_MACHINEGUN_L1:
 	case MZ2_BOSS2_MACHINEGUN_L2:
 	case MZ2_BOSS2_MACHINEGUN_L3:
@@ -524,12 +355,13 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_BOSS2_MACHINEGUN_L5:
 	case MZ2_CARRIER_MACHINEGUN_L1:
 	case MZ2_CARRIER_MACHINEGUN_L2:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("infantry/infatck1.wav"), 1, ATTN_NONE, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.machGunSfx, 1, ATTN_NONE, 0);
 		break;
+
+	// MZ2_SOLDIER_BLASTER, MZ2_TURRET_BLASTER
 	case MZ2_SOLDIER_BLASTER_1:
 	case MZ2_SOLDIER_BLASTER_2:
 	case MZ2_SOLDIER_BLASTER_3:
@@ -539,31 +371,36 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_SOLDIER_BLASTER_7:
 	case MZ2_SOLDIER_BLASTER_8:
 	case MZ2_TURRET_BLASTER:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("soldier/solatck2.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.soldierBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_FLYER_BLASTER
 	case MZ2_FLYER_BLASTER_1:
 	case MZ2_FLYER_BLASTER_2:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("flyer/flyatck3.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.flyerBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_MEDIC_BLASTER 
 	case MZ2_MEDIC_BLASTER_1:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("medic/medatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound  (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.medicBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_HOVER_BLASTER
 	case MZ2_HOVER_BLASTER_1:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("hover/hovatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.hoverBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_FLOAT_BLASTER
 	case MZ2_FLOAT_BLASTER_1:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("floater/fltatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.floatBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_SOLDIER_SHOTGUN
 	case MZ2_SOLDIER_SHOTGUN_1:
 	case MZ2_SOLDIER_SHOTGUN_2:
 	case MZ2_SOLDIER_SHOTGUN_3:
@@ -572,19 +409,21 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_SOLDIER_SHOTGUN_6:
 	case MZ2_SOLDIER_SHOTGUN_7:
 	case MZ2_SOLDIER_SHOTGUN_8:
-		CL_ShotgunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("soldier/solatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_ShotgunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.soldierShotgunSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_TANK_BLASTER
 	case MZ2_TANK_BLASTER_1:
 	case MZ2_TANK_BLASTER_2:
 	case MZ2_TANK_BLASTER_3:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("tank/tnkatck3.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.tankBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_TANK_MACHINEGUN
 	case MZ2_TANK_MACHINEGUN_1:
 	case MZ2_TANK_MACHINEGUN_2:
 	case MZ2_TANK_MACHINEGUN_3:
@@ -604,26 +443,28 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_TANK_MACHINEGUN_17:
 	case MZ2_TANK_MACHINEGUN_18:
 	case MZ2_TANK_MACHINEGUN_19:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		Q_snprintfz(name, sizeof(name), "tank/tnkatk2%c.wav", 'a' + rand() % 5);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound(name), 1, ATTN_NORM, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.tankMachGunSfx[(rand () % 5)], 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_CHICK_ROCKET, MZ2_TURRET_ROCKET
 	case MZ2_CHICK_ROCKET_1:
 	case MZ2_TURRET_ROCKET:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0.2, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("chick/chkatck2.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0.2f, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.chickRocketSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_TANK_ROCKET
 	case MZ2_TANK_ROCKET_1:
 	case MZ2_TANK_ROCKET_2:
 	case MZ2_TANK_ROCKET_3:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0.2, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("tank/tnkatck1.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0.2f, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.tankRocketSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_SUPERTANK_ROCKET, MZ2_BOSS2_ROCKET, MZ2_CARRIER_ROCKET
 	case MZ2_SUPERTANK_ROCKET_1:
 	case MZ2_SUPERTANK_ROCKET_2:
 	case MZ2_SUPERTANK_ROCKET_3:
@@ -632,28 +473,32 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_BOSS2_ROCKET_3:
 	case MZ2_BOSS2_ROCKET_4:
 	case MZ2_CARRIER_ROCKET_1:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0.2, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("tank/rocket.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand()&31), 1, 0.5f, 0.2f, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.superTankRocketSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_GUNNER_GRENADE
 	case MZ2_GUNNER_GRENADE_1:
 	case MZ2_GUNNER_GRENADE_2:
 	case MZ2_GUNNER_GRENADE_3:
 	case MZ2_GUNNER_GRENADE_4:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 0.5, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("gunner/gunatck3.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 0.5f, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.gunnerGrenadeSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_GLADIATOR_RAILGUN, MZ2_CARRIER_RAILGUN, MZ2_WIDOW_RAIL
 	case MZ2_GLADIATOR_RAILGUN_1:
 	case MZ2_CARRIER_RAILGUN:
 	case MZ2_WIDOW_RAIL:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0.5, 0.5, 1.0, false, 1);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0.5f, 0.5f, 1.0f, false, 1);
 		break;
+
+	// MZ2_MAKRON_BFG
 	case MZ2_MAKRON_BFG:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0.5, 1, 0.5, false, 1);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0.5f, 1, 0.5f, false, 1);
 		break;
+
+	// MZ2_MAKRON_BLASTER
 	case MZ2_MAKRON_BLASTER_1:
 	case MZ2_MAKRON_BLASTER_2:
 	case MZ2_MAKRON_BLASTER_3:
@@ -671,37 +516,41 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_MAKRON_BLASTER_15:
 	case MZ2_MAKRON_BLASTER_16:
 	case MZ2_MAKRON_BLASTER_17:
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("makron/blaster.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.makronBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_JORG_MACHINEGUN
 	case MZ2_JORG_MACHINEGUN_L1:
 	case MZ2_JORG_MACHINEGUN_L2:
 	case MZ2_JORG_MACHINEGUN_L3:
 	case MZ2_JORG_MACHINEGUN_L4:
 	case MZ2_JORG_MACHINEGUN_L5:
 	case MZ2_JORG_MACHINEGUN_L6:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("boss3/xfire.wav"), 1, ATTN_NORM, 0);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.jorgMachGunSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_JORG_MACHINEGUN 
 	case MZ2_JORG_MACHINEGUN_R1:
 	case MZ2_JORG_MACHINEGUN_R2:
 	case MZ2_JORG_MACHINEGUN_R3:
 	case MZ2_JORG_MACHINEGUN_R4:
 	case MZ2_JORG_MACHINEGUN_R5:
 	case MZ2_JORG_MACHINEGUN_R6:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
 		break;
+
+	// MZ2_JORG_BFG
 	case MZ2_JORG_BFG_1:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0.5, 1, 0.5, false, 1);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0.5f, 1, 0.5f, false, 1);
 		break;
+
+	// MZ2_BOSS2_MACHINEGUN, MZ2_CARRIER_MACHINEGUN
 	case MZ2_BOSS2_MACHINEGUN_R1:
 	case MZ2_BOSS2_MACHINEGUN_R2:
 	case MZ2_BOSS2_MACHINEGUN_R3:
@@ -709,11 +558,13 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_BOSS2_MACHINEGUN_R5:
 	case MZ2_CARRIER_MACHINEGUN_R1:
 	case MZ2_CARRIER_MACHINEGUN_R2:
-		CL_MachinegunEjectBrass(cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
-		CL_DynamicLight(origin, 200 + (rand()&31), 1, 1, 0, false, 1);
-		CL_SmokePuffParticles(origin, 3, 1);
-
+		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
+		CL_SmokePuffParticles (origin, 3, 1);
 		break;
+
+	// MZ2_STALKER_BLASTER, MZ2_DAEDALUS_BLASTER, MZ2_MEDIC_BLASTER,
+	// MZ2_WIDOW_BLASTER, MZ2_WIDOW_RUN
 	case MZ2_STALKER_BLASTER:
 	case MZ2_DAEDALUS_BLASTER:
 	case MZ2_MEDIC_BLASTER_2:
@@ -753,15 +604,17 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_WIDOW_RUN_6:
 	case MZ2_WIDOW_RUN_7:
 	case MZ2_WIDOW_RUN_8:
-		CL_DynamicLight(origin, 200 + (rand()&31), 0, 1, 0, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("tank/tnkatck3.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), 0, 1, 0, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.tankBlasterSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_WIDOW_DISRUPTOR
 	case MZ2_WIDOW_DISRUPTOR:
-		CL_DynamicLight(origin, 200 + (rand()&31), -1, -1, -1, false, 1);
-		S_StartSound(NULL, ent, CHAN_WEAPON, S_RegisterSound("weapons/disint2.wav"), 1, ATTN_NORM, 0);
-
+		CL_DynamicLight (origin, 200 + (rand () & 31), -1, -1, -1, false, 1);
+		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.trackerFireSfx, 1, ATTN_NORM, 0);
 		break;
+
+	// MZ2_WIDOW_PLASMABEAM, MZ2_WIDOW2_BEAMER, MZ2_WIDOW2_BEAM_SWEEP
 	case MZ2_WIDOW_PLASMABEAM:
 	case MZ2_WIDOW2_BEAMER_1:
 	case MZ2_WIDOW2_BEAMER_2:
@@ -779,8 +632,7 @@ void CL_ParseMonsterMuzzleFlash (void){
 	case MZ2_WIDOW2_BEAM_SWEEP_9:
 	case MZ2_WIDOW2_BEAM_SWEEP_10:
 	case MZ2_WIDOW2_BEAM_SWEEP_11:
-		CL_DynamicLight(origin, 300 + (rand()&100), 1, 1, 0, false, 200);
-
+		CL_DynamicLight (origin, 300 + (rand () & 100), 1, 1, 0, false, 200);
 		break;
 	}
 }
