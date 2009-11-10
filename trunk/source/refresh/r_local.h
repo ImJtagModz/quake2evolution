@@ -44,6 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../win32/glw_win.h"
 #endif
 
+#include "rf_register.h"
 
 // This is defined in s_shared.h
 #undef MAX_MODELS
@@ -429,6 +430,11 @@ typedef struct {
 
 	rgbGen_t				rgbGen;
 	alphaGen_t				alphaGen;
+
+	qboolean				maskRed;
+	qboolean				maskGreen;
+	qboolean				maskBlue;
+	qboolean				maskAlpha;
 } shaderStage_t;
 
 typedef struct shader_s {
@@ -846,6 +852,8 @@ typedef struct {
 	GLenum			blendDst;
 	GLenum			depthFunc;
 	GLboolean		depthMask;
+
+	qboolean		colorMask[4];
 } glState_t;
 
 extern glState_t   glState;
@@ -860,6 +868,7 @@ void		GL_PolygonOffset (GLfloat factor, GLfloat units);
 void		GL_AlphaFunc (GLenum func, GLclampf ref);
 void		GL_BlendFunc (GLenum src, GLenum dst);
 void		GL_DepthFunc (GLenum func);
+void        GL_ColorMask (qboolean red, qboolean green, qboolean blue, qboolean alpha);
 void		GL_DepthMask (GLboolean mask);
 void		GL_SetDefaultState (void);
 void		GL_Setup3D (void);
@@ -1006,88 +1015,6 @@ extern refDef_t		r_refDef;
 
 extern refStats_t	r_stats;
 
-extern cvar_t	*r_noRefresh;
-extern cvar_t	*r_noVis;
-extern cvar_t	*r_noCull;
-extern cvar_t	*r_noBind;
-extern cvar_t	*r_drawWorld;
-extern cvar_t	*r_drawEntities;
-extern cvar_t	*r_drawParticles;
-extern cvar_t	*r_drawPolys;
-extern cvar_t	*r_fullbright;
-extern cvar_t	*r_lightmap;
-extern cvar_t	*r_lockPVS;
-extern cvar_t	*r_logFile;
-extern cvar_t	*r_frontBuffer;
-extern cvar_t	*r_showCluster;
-extern cvar_t	*r_showTris;
-extern cvar_t	*r_showNormals;
-extern cvar_t	*r_showTangentSpace;
-extern cvar_t	*r_showModelBounds;
-extern cvar_t	*r_showShadowVolumes;
-extern cvar_t	*r_offsetFactor;
-extern cvar_t	*r_offsetUnits;
-extern cvar_t	*r_debugSort;
-extern cvar_t	*r_speeds;
-extern cvar_t	*r_clear;
-extern cvar_t	*r_singleShader;
-extern cvar_t	*r_skipBackEnd;
-extern cvar_t	*r_skipFrontEnd;
-extern cvar_t	*r_allowSoftwareGL;
-extern cvar_t	*r_maskMiniDriver;
-extern cvar_t	*r_glDriver;
-extern cvar_t	*r_allowExtensions;
-extern cvar_t	*r_arb_multitexture;
-extern cvar_t	*r_arb_texture_env_add;
-extern cvar_t	*r_arb_texture_env_combine;
-extern cvar_t	*r_arb_texture_env_dot3;
-extern cvar_t	*r_arb_texture_cube_map;
-extern cvar_t	*r_arb_texture_compression;
-extern cvar_t	*r_arb_vertex_buffer_object;
-extern cvar_t	*r_arb_vertex_program;
-extern cvar_t	*r_arb_fragment_program;
-extern cvar_t	*r_ext_draw_range_elements;
-extern cvar_t	*r_ext_compiled_vertex_array;
-extern cvar_t	*r_ext_texture_edge_clamp;
-extern cvar_t	*r_ext_texture_filter_anisotropic;
-extern cvar_t	*r_ext_texture_rectangle;
-extern cvar_t	*r_ext_stencil_two_side;
-extern cvar_t	*r_ext_generate_mipmap;
-extern cvar_t	*r_ext_swap_control;
-extern cvar_t	*r_swapInterval;
-extern cvar_t	*r_finish;
-extern cvar_t	*r_stereo;
-extern cvar_t	*r_colorBits;
-extern cvar_t	*r_depthBits;
-extern cvar_t	*r_stencilBits;
-extern cvar_t	*r_mode;
-extern cvar_t	*r_fullscreen;
-extern cvar_t	*r_customWidth;
-extern cvar_t	*r_customHeight;
-extern cvar_t	*r_displayRefresh;
-extern cvar_t	*r_ignoreHwGamma;
-extern cvar_t	*r_gamma;
-extern cvar_t	*r_overBrightBits;
-extern cvar_t	*r_ignoreGLErrors;
-extern cvar_t	*r_shadows;
-extern cvar_t	*r_caustics;
-extern cvar_t	*r_lodBias;
-extern cvar_t	*r_lodDistance;
-extern cvar_t	*gl_dynamic;
-extern cvar_t	*gl_modulate;
-extern cvar_t	*r_ambientScale;
-extern cvar_t	*r_directedScale;
-extern cvar_t	*r_intensity;
-extern cvar_t	*r_roundImagesDown;
-extern cvar_t	*r_maxTextureSize;
-extern cvar_t	*r_picmip;
-extern cvar_t	*r_textureBits;
-extern cvar_t	*r_textureFilter;
-extern cvar_t	*r_textureFilterAnisotropy;
-extern cvar_t	*r_jpegCompressionQuality;
-extern cvar_t	*r_detailTextures;
-extern cvar_t	*r_inGameVideo;
-
 void		R_DrawAliasModel (void);
 void		R_AddAliasModelToList (entity_t *entity);
 
@@ -1100,9 +1027,17 @@ void		R_EndBuildingLightmaps (void);
 void		R_BuildSurfaceLightmap (surface_t *surf);
 void		R_UpdateSurfaceLightmap (surface_t *surf);
 
+// // ===========================================================================
+// rf_cull.c
+
 qboolean	R_CullBox (const vec3_t mins, const vec3_t maxs, int clipFlags);
 qboolean	R_CullSphere (const vec3_t origin, float radius, int clipFlags);
+qboolean    R_CullSurface (surface_t *surf, const vec3_t origin, int clipFlags);
 
+// // ===========================================================================
+// r_main.c
+
+void        R_ModeList_f ();
 void		R_RotateForEntity (entity_t *entity);
 
 void		R_AddMeshToList (meshType_t meshType, void *mesh, shader_t *shader, entity_t *entity, int infoKey);

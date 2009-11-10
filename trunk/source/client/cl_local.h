@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // - Primary header for client
 //
 
-
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
@@ -83,6 +82,14 @@ typedef struct {
 enum {
 	// Particles
 	PT_ENERGY,
+
+	PT_SMOKE1,
+	PT_SMOKE2,
+	PT_SMOKE3,
+
+	PT_FIRE1,
+
+	PT_SPARK,
 
 	// Total
 	PT_PICTOTAL
@@ -715,7 +722,7 @@ void		CL_BubbleTrail (const vec3_t start, const vec3_t end, float dist, float ra
 void		CL_FlagTrail (const vec3_t start, const vec3_t end, float r, float g, float b);
 void		CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, float b);
 void		CL_BulletParticles (const vec3_t org, const vec3_t dir);
-void		CL_ExplosionParticles (const vec3_t org);
+void        CL_ExplosionParticles (const vec3_t org, float scale, qboolean exploOnly, qboolean inWater);
 void		CL_BFGExplosionParticles (const vec3_t org);
 void		CL_TrackerExplosionParticles (const vec3_t org);
 void		CL_SmokePuffParticles (const vec3_t org, float radius, int count);
@@ -745,6 +752,7 @@ void		CL_SteamParticles (const vec3_t org, const vec3_t dir, int count, int colo
 void		CL_BuildSolidList (void);
 trace_t		CL_Trace (const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int skipNumber, int brushMask, qboolean brushOnly, int *entNumber);
 int			CL_PointContents (const vec3_t point, int skipNumber);
+void        CL_PMTraceDecal (trace_t *out, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, qboolean entities, qboolean bModels);
 
 void		CL_CheckPredictionError (void);
 void		CL_PredictMovement (void);

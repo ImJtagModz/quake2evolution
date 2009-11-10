@@ -1,27 +1,72 @@
+==================================================
+Generic
+==================================================
+Optimizations
+* Do a code analyst to see what takes most samples aka slowest code
+
+==================================================
 Client
-* Replace all media with my own (textures, materials etc.) and clean it up
-  - This needs some editing for the particle textures path of the material function (look at egl) or not
-  - Finish replace all muzzle flash with new structer
+==================================================
+Cleanups
 * Clean up register
-* Start rewrite the particle system
-  - Start with the allocating 
-    - This got problems with cl_particleMax
-    - So move over to CL_AddParticle
-      - Move alpha to color vec4_t
-      - Add thinking functions
-* Change icon
-* Fix brass origin with q2xp in muzzle flash code
+
+Features
+* Start rewrite the particle system 
+  - Start rewrite the particle effects
+* Change icon texture
 * Add shadows from the player model
 
-Bugs
+Fixes
+* Fix brass origin with q2xp in muzzle flash code
 * The gravity on particles when you are lets say the flyer in vortex is fucked up
-* p_auth map has a very wierd obilivion at the monsters start, wtf can this be?
-* Find out why it never really connects to online servers like vortex;
-you have to force it to connect
 * Alpha spawning monsters in vortex doenst work, i cant see them'
   - This has to do with ent.flags and RF_ / EF_ flags in CL_AddPacketEntities 
 
-Done
+==================================================
+Renderer frontend
+==================================================
+Cleanups
+* Finish clean up R_GfxInfo_f
+* Rename all shader stuff to material
+
+Optimizations
+* Make the material parser abit faster by not setting the token in the function but
+in the parser function it self
+
+==================================================
+Not sure
+==================================================
+Bugs
+* p_auth map has a very wierd obilivion at the monsters start, wtf can this be?
+* Find out why it never really connects to online servers like vortex;
+you have to force it to connect
+
+Crashes
+* I had a bad entityType in R_AddEntitiesToList on p_auth.
+* Shadows crashed on shader = surface->shaders[entity->skinNum].shader;, on that map p_auth.
+
+==================================================
+SVN Comments
+==================================================
+
+==================================================
+Vortex Stand-alone game ideas
+==================================================
+* Support for Q3BSP
+* GUI main menu 'easy-to-start-playing-menu'
+* Ingame menus
+  - Login/out
+  - Classes, abilities etc
+    - Show a "3D" model of the classes etc
+* Better effects, replace any effect model with particles / localent effect
+* Better netcode to avoid the "Net message overflow" when there is too many monsters on the map
+
+// ===========================================================================
+
+New material stage keywords
+* surfType
+* maskColor
+* makeAlpha (TODO! (for lasers))
   
 New in 0.2.0
 * Material script system
@@ -41,10 +86,67 @@ New in 0.2.0
   
   
   
+beams/laser
+{
+	twoSided
+	sort almostNearest
+
+
+	{
+		maskColor
+		map makeAlpha ( effects/misc/laser_flat_alpha.tga )
+	}
+	{
+		blend GL_DST_ALPHA , GL_ONE
+		maskAlpha
+		map effects/misc/laser_flat_dust.tga
+		scroll time * .3 , time * .1
+		scale 1 , 0.25
+		colored
+	}
+	{
+		blend GL_DST_ALPHA , GL_ONE
+		maskAlpha
+		map effects/misc/laser_flat_dust.tga
+		scroll time * .1 , time * .3
+		scale 1 , 0.35
+		colored
+	}
+	{
+		map effects/misc/laser_flat.tga
+		blend GL_ONE , GL_ONE
+		colored
+	}
+}
   
   
-  
-  
+Wanted Features List
+* 3D HUD models (scrible?)
+* Material based blob shadows
+* Q3BSP format
+* GLSL with materials using a uniform structer
+  - Refraction, reflection effects
+* Particle editor
+  - Edit the already existing function variables
+* Decal editor
+  - Edit the already existing function variables
+* World surface sound, decal and particle effects via materials
+* Simple shadows maps for models (like qfusion)
+* Rattle effect (the camera shacks effect when a explotion happens for example)
+* Scriptble GUI menu
+* R1ch´s enchanced net protocol "35" and anticheat.dll
+* EGL´s file and memory system
+* !version and !renderer
+* Better r_speeds; fps, ping and map time counter
+* Better debug tools such as r_showtris
+* Anti-aliasing for the edges of polygons  
+
+Wanted Misc Feature List
+* Better forum theme
+* Site Wiki
+* Better looking modDB
+* Team name
+* Local server (www.NAME.com, not a subdomain)
   
 /*
 ==============================================================================
@@ -52,7 +154,7 @@ New in 0.2.0
 	KEY HANDLING	
 	
 ==============================================================================
-*/  
+*/   
 
 // ===========================================================================
   

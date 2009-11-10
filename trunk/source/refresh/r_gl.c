@@ -264,6 +264,23 @@ void GL_DepthFunc (GLenum func){
 }
 
 /*
+ ==================
+ GL_ColorMask
+ ==================
+*/
+void GL_ColorMask (qboolean red, qboolean green, qboolean blue, qboolean alpha)
+{
+	if (glState.colorMask[0] == red && glState.colorMask[1] == green && glState.colorMask[2] == blue && glState.colorMask[3] == alpha)
+		return;
+	glState.colorMask[0] = red;
+	glState.colorMask[1] = green;
+	glState.colorMask[2] = blue;
+	glState.colorMask[3] = alpha;
+
+	qglColorMask(red, green, blue, alpha);
+}
+
+/*
  =================
  GL_DepthMask
  =================
@@ -314,6 +331,11 @@ void GL_SetDefaultState (void){
 	glState.blendDst = GL_ONE_MINUS_SRC_ALPHA;
 	glState.depthFunc = GL_LEQUAL;
 	glState.depthMask = GL_TRUE;
+
+	glState.colorMask[0] = GL_TRUE;
+	glState.colorMask[1] = GL_TRUE;
+	glState.colorMask[2] = GL_TRUE;
+	glState.colorMask[3] = GL_TRUE;
 
 	// Set default state
 	qglEnable(GL_CULL_FACE);

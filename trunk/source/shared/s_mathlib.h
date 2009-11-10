@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // s_mathlib.h
 //
 
+#define BACKFACE_EPSILON	0.01
+
 #define TINY_NUMBER (1.e-8)
 
 /*

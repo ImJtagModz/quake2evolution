@@ -987,6 +987,8 @@ static void RB_SetShaderStageState (shaderStage_t *stage){
 		GL_DepthMask(GL_TRUE);
 	else
 		GL_DepthMask(GL_FALSE);
+
+	GL_ColorMask (!stage->maskRed, !stage->maskGreen, !stage->maskBlue, !stage->maskAlpha);
 }
 
 /*
