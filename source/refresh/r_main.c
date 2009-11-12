@@ -473,10 +473,14 @@ static void R_DrawNullModels (void){
  R_DrawParticle
  =================
 */
+#define DEPTHHACK_RANGE_SHORT	0.999f
+#define DEPTHHACK_RANGE_MID		0.997f
+#define DEPTHHACK_RANGE_LONG	0.99f
 void R_DrawParticle (void){
 
 	particle_t	*particle = rb_mesh->mesh;
 	vec3_t		axis[3];
+	float       glDepthMin, glDepthMax;
 	int			i;
 
 	// Draw it
@@ -488,6 +492,16 @@ void R_DrawParticle (void){
 		indexArray[numIndex++] = numVertex + i-1;
 		indexArray[numIndex++] = numVertex + i;
 	}
+
+	// Depth hack
+	if (particle->flags = PARTICLE_DEPTHHACK_SHORT)
+		qglDepthRange (glDepthMin, glDepthMin + DEPTHHACK_RANGE_SHORT * (glDepthMax - glDepthMin));
+	if (particle->flags = PARTICLE_DEPTHHACK_MID)
+		qglDepthRange (glDepthMin, glDepthMin + DEPTHHACK_RANGE_MID * (glDepthMax - glDepthMin));
+	if (particle->flags = PARTICLE_DEPTHHACK_LONG)
+		qglDepthRange (glDepthMin, glDepthMin + DEPTHHACK_RANGE_LONG * (glDepthMax - glDepthMin));
+	else 
+		qglDepthRange (0, 1);
 
 	if (particle->length != 1)
 	{
@@ -590,6 +604,8 @@ void R_DrawParticle (void){
 
 		numVertex++;
 	}
+
+	qglDepthRange(0, 1);
 }
 
 /*
@@ -1063,7 +1079,7 @@ void R_AddLightToScene (const vec3_t origin, float intensity, float r, float g, 
  R_AddParticleToScene
  =================
 */
-void R_AddParticleToScene (shader_t *shader, const vec3_t origin, const vec3_t oldOrigin, float radius, float length, float rotation, const color_t modulate){
+void R_AddParticleToScene (shader_t *shader, const vec3_t origin, const vec3_t oldOrigin, float radius, float length, float rotation, const color_t modulate, int flags){
 
 	particle_t	*particle;
 
@@ -1078,6 +1094,7 @@ void R_AddParticleToScene (shader_t *shader, const vec3_t origin, const vec3_t o
 	particle->radius = radius;
 	particle->length = length;
 	particle->rotation = rotation;
+	particle->flags;
 	MakeRGBA(particle->modulate, modulate[0], modulate[1], modulate[2], modulate[3]);
 }
 

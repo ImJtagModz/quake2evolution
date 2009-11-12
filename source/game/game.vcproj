@@ -75,7 +75,7 @@
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="winmm.lib"
 				OutputFile="..\debug\q2e_gamex86.dll"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\game.def"
 				GenerateDebugInformation="true"
