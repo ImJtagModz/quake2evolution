@@ -83,6 +83,7 @@ typedef struct {
 	float			length;
 	float			rotation;
 	color_t			modulate;
+	int			            flags;
 } particle_t;
 
 typedef struct {
@@ -200,7 +201,7 @@ void			R_DrawScreenRect (float x, float y, float w, float h, const color_t modul
 void			R_ClearScene (void);
 void			R_AddEntityToScene (const entity_t *entity);
 void			R_AddLightToScene (const vec3_t origin, float intensity, float r, float g, float b);
-void			R_AddParticleToScene (struct shader_s *shader, const vec3_t origin, const vec3_t oldOrigin, float radius, float length, float rotation, const color_t modulate);
+void			R_AddParticleToScene (struct shader_s *shader, const vec3_t origin, const vec3_t oldOrigin, float radius, float length, float rotation, const color_t modulate, int flags);
 void			R_AddPolyToScene (struct shader_s *shader, int numVerts, const polyVert_t *verts);
 void			R_RenderScene (const refDef_t *rd);
 
@@ -228,5 +229,9 @@ enum {
 
     MATERIAL_SURFACE_TYPE			= BIT(1),
 };
+
+#define PARTICLE_DEPTHHACK_SHORT		32
+#define PARTICLE_DEPTHHACK_MID			64
+#define PARTICLE_DEPTHHACK_LONG			128
 
 #endif // __REFRESH_H__

@@ -536,7 +536,7 @@ void CL_ParseTempEntity (void){
 			S_StartSound(pos, 0, 0, clMedia.sfx.grenadeExplosion, 1, ATTN_NORM, 0);
 		}
 		else {
-			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.grenadeExplosionWaterShader);
+			//CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.grenadeExplosionWaterShader);
 			CL_ExplosionWaterSplash(pos);
 			CL_BubbleParticles(pos, 384, 30);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
@@ -554,13 +554,13 @@ void CL_ParseTempEntity (void){
 		CL_FindExplosionPlane(pos, 40, dir);
 
 		if (teType != TE_ROCKET_EXPLOSION_WATER){
-			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
+			//CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
 			CL_ExplosionParticles(pos, 1, false, false);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
 			S_StartSound(pos, 0, 0, clMedia.sfx.rocketExplosion, 1, ATTN_NORM, 0);
 		}
 		else {
-			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionWaterShader);
+			//CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionWaterShader);
 			CL_ExplosionWaterSplash(pos);
 			CL_BubbleParticles(pos, 384, 30);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
@@ -578,7 +578,7 @@ void CL_ParseTempEntity (void){
 			// HACK!!!
 			CL_FindExplosionPlane(pos, 40, dir);
 
-			CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
+			//CL_Explosion(pos, dir, 40, rand() % 360, 350, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
 			CL_ExplosionParticles(pos, 1, false, false);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
 			S_StartSound(pos, 0, 0, clMedia.sfx.rocketExplosion, 1, ATTN_NORM, 0);
@@ -587,7 +587,7 @@ void CL_ParseTempEntity (void){
 			// HACK!!!
 			CL_FindExplosionPlane(pos, 60, dir);
 
-			CL_Explosion(pos, dir, 60, rand() % 360, 500, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
+			//CL_Explosion(pos, dir, 60, rand() % 360, 500, 1.0, 0.5, 0.5, cl.media.rocketExplosionShader);
 			CL_ExplosionParticles(pos, 1, false, true);
 			CL_ImpactMark(pos, dir, rand() % 360, 60, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
 			S_StartSound(pos, 0, 0, clMedia.sfx.rocketExplosion, 1, ATTN_NORM, 0);
@@ -602,14 +602,14 @@ void CL_ParseTempEntity (void){
 			// HACK!!!
 			CL_FindExplosionPlane(pos, 40, dir);
 
-			CL_Explosion(pos, vec3_origin, 40, 0, 350, 0.0, 1.0, 0.0, cl.media.bfgExplosionShader);
+			//CL_Explosion(pos, vec3_origin, 40, 0, 350, 0.0, 1.0, 0.0, cl.media.bfgExplosionShader);
 			CL_ImpactMark(pos, dir, rand() % 360, 40, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
 		}
 		else {
 			// HACK!!!
 			CL_FindExplosionPlane(pos, 60, dir);
 
-			CL_Explosion(pos, vec3_origin, 60, 0, 500, 0.0, 1.0, 0.0, cl.media.bfgExplosionShader);
+			//CL_Explosion(pos, vec3_origin, 60, 0, 500, 0.0, 1.0, 0.0, cl.media.bfgExplosionShader);
 			CL_BFGExplosionParticles(pos);
 			CL_ImpactMark(pos, dir, rand() % 360, 60, 1, 1, 1, 1, false, cl.media.burnMarkShader, false);
 		}
@@ -804,7 +804,7 @@ void CL_ParseTempEntity (void){
 			pos2[1] = pos[1];
 			pos2[2] = pos[2] + 60 + (i * 60);
 
-			CL_Explosion(pos2, dir, 90, rand() % 360, 0, 0, 0, 0, cl.media.rocketExplosionShader);
+			//CL_Explosion(pos2, dir, 90, rand() % 360, 0, 0, 0, 0, cl.media.rocketExplosionShader);
 			CL_NukeSmokeParticles(pos2);
 		}
 
@@ -813,7 +813,7 @@ void CL_ParseTempEntity (void){
 			pos2[1] = pos[1] + crand() * 150;
 			pos2[2] = pos[2] + crand() * 150 + 360;
 
-			CL_Explosion(pos2, dir, 90, rand() % 360, 0, 0, 0, 0, cl.media.rocketExplosionShader);
+			//CL_Explosion(pos2, dir, 90, rand() % 360, 0, 0, 0, 0, cl.media.rocketExplosionShader);
 			CL_NukeSmokeParticles(pos2);
 		}
 

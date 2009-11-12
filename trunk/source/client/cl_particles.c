@@ -565,7 +565,7 @@ nextParticle:
 		}
 
 		// Send the particle to the renderer
-		R_AddParticleToScene (p->shader, org, org2, size, length, p->rotation, modulate);
+		R_AddParticleToScene (p->shader, org, org2, size, length, p->rotation, modulate, p->flags);
 	}
 
 	cl_activeParticles = active;
@@ -845,131 +845,111 @@ void CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, 
  CL_ExplosionParticles
  ==================
 */
-void CL_ExplosionParticles (const vec3_t org, float scale, qboolean exploOnly, qboolean inWater)
-{	int			i, j, flags = 0;
-	vec3_t		normal, angle, endPos;
-	vec3_t		vec;
-	float		distScale;
-	float		d, time;
-	float		angle2, sy, cy, sp, cp;
-	qboolean	decal;
+void CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolean inWater)
+{
+	// assume "origin" is origin of explosion
+	// and "org" is the particle's origin
+	float speed = 20.0f;
+	vec3_t sub, forward, velocity, origin;
 
-	if (!exploOnly)
-	{
-#if 0
-		// Smoke
-		j = scale + 3;
-		for (i = 0; i < j; i++)
-		{
-			CL_SpawnParticle (
-				org[0] + (crand () * 4),		       org[1] + (crand () * 4),		           org[2] + (crand () * 4),
-				0,					                   0,				                       0,
-				crand () * 2,				       	   crand () * 2,					       crand () * 2,
-				0,					                   0,				                       0,
-			    0.15f,					               0.15f,				                   0.15f,
-			    0.75,					               0.75,				                   0.75,
-				PT_SMOKE1 + (rand () & 2),
-				0.9f + (crand () * 0.1f),		       -1.0f / (2.0f + (3 * 3.0f) + (crand () * 0.2f)),
-				(40 + (crand () * 5)) * scale,	       (100 + (crand () * 10)) * scale,
-				0,
-				0,
-				frand () * 360,
-				1,                                     0,
-				pSmokeThink,						   NULL,								   NULL);
-		}
-#endif
-	}
 
-	if (exploOnly)
-		return;
+	vec3_t     endPos, normal;
+	qboolean   decal;
+	float      distScale;
+	int        i, j, flags = 0;
 
 	// Explosion mark
 	decal = CL_FindExplosionDir (org, 30 * scale, endPos, normal);
 	if (!decal)
 		Vec3Set (normal, 0, 0, 1);
-#if 0
-	j = scale + 3;
+
+	// Upwards fire
+	j = scale + 6;
 	for (i = 1; i < j; i++)
 	{
-		distScale = (float)i/(float)j;
 		CL_SpawnParticle (
-			org[0] + (crand () * 4) + (normal[0] * 8 * distScale),		      
-			org[1] + (crand () * 4) + (normal[1] * 8 * distScale),
-			org[2] + (crand () * 4) + (normal[2] * 8 * distScale),
+			org[0] + (crand () * 9) + (normal[0] * 7),			   
+			org[1] + (crand () * 9) + (normal[1] * 7),			   
+			org[2] + (crand () * 9) + (normal[2] * 7),
 			0,					                   0,				                       0,
-			normal[0] * 90 * distScale,		       normal[1] * 90 * distScale,		       normal[2] * 90 * distScale,
-			normal[0] * -32 * distScale,	       normal[1] * -32 * distScale,	           (normal[2] * -32 * distScale) + 5 + (frand () * 6),
-			0.15f,					               0.15f,				                   0.15f,
-			0.75,					               0.75,				                   0.75,
-			PT_SMOKE1 + (rand () & 2),
-			0.85f + (crand () * 0.1f),		       -1.0f / (1.5f + 3 + (crand () * 0.2f)),
-			(30 + (crand () * 5)) * scale,	       (120 + (crand () * 10)) * scale,
+			normal[0] * 290,					   normal[1] * 290,				           normal[2] * 290,
+			0,					                   0,				                       0,
+			1.0f,					               1.0f,				                   1.0f,
+			0,					                   0,				                       0,
+			PT_FIRE1 + (rand () & 2),
+			0.95f,					               -6.0f,
+			55 + (crand () * 9.5f),				   55 + (crand () * 9.5f),
 			0,
 			0,
 			frand () * 360,
 			1,                                     0,
 			pSmokeThink,						   NULL,								   NULL);
 	}
-#endif
-	flags = 0;
 
 	if (cl_particleVertexLight->integer)
 		flags |= PARTICLE_VERTEXLIGHT;
 
-	for (i = 0; i < NUM_VERTEX_NORMALS; i++)
+	// Upwards smoke
+	j = scale + 4;
+	for (i = 1; i < j; i++)
 	{
-		angle2 = time * cl_particleVelocities[i][0];
-		sy = sin(angle2);
-		cy = cos(angle2);
-		angle2 = time * cl_particleVelocities[i][1];
-		sp = sin(angle2);
-		cp = cos(angle2);
+		distScale = (float)i/(float)j;
 
-		vec[0] = cp*cy;
-		vec[1] = cp*sy;
-		vec[2] = -sp;
-
-		d = sin(time + i) * 44.0f; 
-
-		// Smoke
 		CL_SpawnParticle (
-			org[0] + byteDirs[i][0]*d + vec[0]*16,		      
-			org[1] + byteDirs[i][1]*d + vec[0]*16,
-			org[2] + byteDirs[i][2]*d + vec[0]*16,
+			org[0] + (crand () * 9) + (normal[0] * 7 * distScale),			   
+			org[1] + (crand () * 9) + (normal[1] * 7 * distScale),			   
+			org[2] + (crand () * 9) + (normal[2] * 7 * distScale),
 			0,					                   0,				                       0,
-			crand () * 2,				       	   crand () * 2,					       crand () * 2,
-			0,					                   0,				                       10,
-			0.15f,					               0.15f,				                   0.15f,
-			0.75,					               0.75,				                   0.75,
+			normal[0] * 90 * distScale,		       normal[1] * 90 * distScale,			   normal[2] * 90 * distScale,
+			0,					                   0,				                       0,
+			0.2f,					               0.2f,				                   0.2f,
+			0,					                   0,				                       0,
 			PT_SMOKE1 + (rand () & 2),
-			0.5f + (crand () * 0.1f),			   -9.1f / (1.0f + (3 * 10.0f) + (crand () * 0.15f)),
-			(10 + (crand () * 5)) * scale,	       (100 + (crand () * 10)) * scale,
-			flags,
-			0,
-			frand () * 360,
-			1,                                     0,
-			pSmokeThink,						   NULL,								   NULL);
-
-		// Fire
-		CL_SpawnParticle (
-			org[0] + byteDirs[i][0]*d + vec[0]*16,		      
-			org[1] + byteDirs[i][1]*d + vec[0]*16,
-			org[2] + byteDirs[i][2]*d + vec[0]*16,
-			0,					                   0,				                       0,
-			crand () * 2,				       	   crand () * 2,					       crand () * 2,
-			0,					                   0,				                       10,
-			0.15f,					               0.15f,				                   0.15f,
-			0.75,					               0.75,				                   0.75,
-			PT_FIRE1,
-			0.7f + (crand () * 0.1f),			   -30.0f / (1.0f + (3 * 10.0f) + (crand () * 0.15f)),
-			(10 + (crand () * 5)) * scale,	       (10 + (crand () * 10)) * scale,
+			0.5f,					               -0.2f,
+			65 + (crand () * 9.5f),				   35 + (crand () * 9.5f),
 			flags,
 			0,
 			frand () * 360,
 			1,                                     0,
 			pSmokeThink,						   NULL,								   NULL);
 	}
+
+	// Outwards smoke
+	for (i = 0; i < 19; i++)
+	{
+		// Calcs for outwards smoke -- Thanks paril!
+		Vec3Copy (org, origin);
+		origin[0] += crand () * 3;
+		origin[1] += crand () * 3;
+
+		Vec3Subtract (origin, org, sub);
+		for (j = 0; j < 3; j++)
+			velocity[j] = sub[j] * -speed;
+
+		CL_SpawnParticle (
+			org[0],			   
+			org[1],			   
+			org[2],
+			0,					                   0,				                       0,
+			velocity[0],					       velocity[1],				               velocity[2],
+			0,					                   0,				                       0,
+			0.2f,					               0.2f,				                   0.2f,
+			0,					                   0,				                       0,
+			PT_SMOKE1 + (rand () & 2),
+			0.5f,					               -0.2f,
+			35 + (crand () * 9.5f),				   25 + (crand () * 9.5f),
+			flags,
+			0,
+			frand () * 360,
+			1,                                     0,
+			pSmokeThink,						   NULL,								   NULL);
+	}
+
+	// Fire sparks
+
+	// Embers
 }
+
 
 /*
  ==================

@@ -259,7 +259,12 @@ static void CL_GFXMediaInit ()
 	clMedia.particleTable[PT_SMOKE2]		= R_RegisterShader ("particles/smoke2");
 	clMedia.particleTable[PT_SMOKE3]		= R_RegisterShader ("particles/smoke3");
 
+	clMedia.particleTable[PT_SMOKE4]		= R_RegisterShader ("particles/smoke4");
+	clMedia.particleTable[PT_SMOKE5]		= R_RegisterShader ("particles/smoke5");
+
 	clMedia.particleTable[PT_FIRE1]		    = R_RegisterShader ("particles/fire1");
+	clMedia.particleTable[PT_FIRE2]		    = R_RegisterShader ("particles/fire2");
+	clMedia.particleTable[PT_FIRE3]		    = R_RegisterShader ("particles/fire3");
 
 	clMedia.particleTable[PT_SPARK]		    = R_RegisterShader ("particles/spark");
 }

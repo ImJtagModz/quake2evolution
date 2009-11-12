@@ -16,7 +16,18 @@ Features
 * Change icon texture
 * Add shadows from the player model
 
+Particel Effect Features
+* Doom 3 uses depthhack for some particles that makest them not cut on bsp
+* Doom 3 has a flag in direction called "outwards", it makes for example smoke
+go outwards from its origin
+  - This would be a rendering flag, there is 3 steps for this and they are:
+    - DEPTHHACK_RANGE_SHORT 
+    - DEPTHHACK_RANGE_MID
+    - DEPTHHACK_RANGE_LONG
+
 Fixes
+* Remove menu and make console the "mainmenu" for now
+  - Seems that UI_SetActiveMenu is the function that activates menu on startup
 * Fix brass origin with q2xp in muzzle flash code
 * The gravity on particles when you are lets say the flyer in vortex is fucked up
 * Alpha spawning monsters in vortex doenst work, i cant see them'
@@ -40,6 +51,7 @@ Bugs
 * p_auth map has a very wierd obilivion at the monsters start, wtf can this be?
 * Find out why it never really connects to online servers like vortex;
 you have to force it to connect
+* set game "mod" doesnt change to the mod
 
 Crashes
 * I had a bad entityType in R_AddEntitiesToList on p_auth.
@@ -147,6 +159,20 @@ Wanted Misc Feature List
 * Better looking modDB
 * Team name
 * Local server (www.NAME.com, not a subdomain)
+  
+==================================================
+Wanted Misc Feature List (more specific)
+==================================================  
+ModDB
+* Front Page: 
+  - Needs detail about what the project is about,
+  discribing back-story, technologi wih screenshots.
+* Features Page:
+  - Needs tech engine features with a screenshos
+* Tutorial Page:
+  - Needs some .doc file about the material system, 
+  particle design ideas, decal etc
+  
   
 /*
 ==============================================================================

@@ -87,7 +87,12 @@ enum {
 	PT_SMOKE2,
 	PT_SMOKE3,
 
+	PT_SMOKE4,
+	PT_SMOKE5,
+
 	PT_FIRE1,
+	PT_FIRE2,
+	PT_FIRE3,
 
 	PT_SPARK,
 
@@ -722,7 +727,7 @@ void		CL_BubbleTrail (const vec3_t start, const vec3_t end, float dist, float ra
 void		CL_FlagTrail (const vec3_t start, const vec3_t end, float r, float g, float b);
 void		CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, float b);
 void		CL_BulletParticles (const vec3_t org, const vec3_t dir);
-void        CL_ExplosionParticles (const vec3_t org, float scale, qboolean exploOnly, qboolean inWater);
+void        CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolean inWater);
 void		CL_BFGExplosionParticles (const vec3_t org);
 void		CL_TrackerExplosionParticles (const vec3_t org);
 void		CL_SmokePuffParticles (const vec3_t org, float radius, int count);
