@@ -408,7 +408,7 @@ void CL_ParseTempEntity (void){
 		MSG_ReadDir(&net_message, dir);
 
 		CL_BulletParticles(pos, dir);
-		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, cl.media.bulletMarkShader, false);
+		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, clMedia.bulletMetalMarkMaterial, false);
 
 		i = rand() & 15;
 		if (i >= 1 && i <= 3)
@@ -420,7 +420,7 @@ void CL_ParseTempEntity (void){
 		MSG_ReadDir(&net_message, dir);
 
 		CL_BulletParticles(pos, dir);
-		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, cl.media.bulletMarkShader, false);
+		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, clMedia.bulletMetalMarkMaterial, false);
 
 		break;
 	case TE_SPARKS:
@@ -506,7 +506,7 @@ void CL_ParseTempEntity (void){
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadDir(&net_message, dir);
 
-		CL_BlasterParticles(pos, dir, 0.97, 0.46, 0.14);
+		CL_BlasterParticles(pos, dir, 1.0f, 0.40f, 0.019f);
 		CL_ImpactMark(pos, dir, rand() % 360, 3, 0.97, 0.46, 0.14, 1, true, cl.media.energyMarkShader, false);
 		CL_DynamicLight(pos, 150, 1.0, 1.0, 0.0, true, 350);
 		S_StartSound (pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
@@ -693,7 +693,7 @@ void CL_ParseTempEntity (void){
 		MSG_ReadDir(&net_message, dir);
 
 		CL_BulletParticles(pos, dir);
-		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, cl.media.bulletMarkShader, false);
+		CL_ImpactMark(pos, dir, rand() % 360, 3, 1, 1, 1, 1, false, clMedia.bulletMetalMarkMaterial, false);
 		CL_DynamicLight(pos, 150, 0.19, 0.41, 0.75, true, 350);
 		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
@@ -701,6 +701,12 @@ void CL_ParseTempEntity (void){
 	case TE_LIGHTNING:
 		ent = CL_ParseLightning();
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.lightning, 1, ATTN_NORM, 0);
+		break;
+
+	case TE_DEBUGTRAIL:
+		MSG_ReadPos(&net_message, pos);
+		MSG_ReadPos(&net_message, pos2);
+		//CG_DebugTrail (pos, pos2);
 		break;
 
 	case TE_FLASHLIGHT:
@@ -730,7 +736,7 @@ void CL_ParseTempEntity (void){
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadDir(&net_message, dir);
 
-		CL_BlasterParticles(pos, dir, 0.97, 0.46, 0.14);
+		CL_BlasterParticles(pos, dir, 1.0f, 0.40f, 0.019f);
 		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;
 
@@ -738,7 +744,7 @@ void CL_ParseTempEntity (void){
 		MSG_ReadPos(&net_message, pos);
 		MSG_ReadDir(&net_message, dir);
 	
-		CL_BlasterParticles(pos, dir, 0.97, 0.46, 0.14);
+		CL_BlasterParticles(pos, dir, 1.0f, 0.40f, 0.019f);
 		CL_ImpactMark(pos, dir, rand() % 360, 3, 0.97, 0.46, 0.14, 1, true, cl.media.energyMarkShader, false);
 		S_StartSound(pos, 0, 0, clMedia.sfx.laserHit, 1, ATTN_NORM, 0);
 		break;

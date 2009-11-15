@@ -86,15 +86,15 @@ enum {
 	PT_SMOKE1,
 	PT_SMOKE2,
 	PT_SMOKE3,
-
 	PT_SMOKE4,
-	PT_SMOKE5,
 
 	PT_FIRE1,
 	PT_FIRE2,
 	PT_FIRE3,
 
 	PT_SPARK,
+
+	PT_BUBBLE,
 
 	// Total
 	PT_PICTOTAL
@@ -154,6 +154,9 @@ typedef struct clMediaSounds_s {
 	clMzMedia_t			mz;
 	clMz2Media_t		mz2;
 
+	struct sfx_s	    *machinegunBrass[11];
+	struct sfx_s	    *shotgunBrass[3];
+
 	struct sfx_s		*ricochet[3];
 	struct sfx_s		*spark[3];
 
@@ -197,15 +200,27 @@ typedef struct clMedia_s {
 	struct shader_s	    *disconnectedMaterial;
 	struct shader_s	    *backTileMaterial;
 	struct shader_s	    *pauseMaterial;
+	
+	struct shader_s	    *whiteMaterial; 
+	struct shader_s	    *consoleMaterial; 
+	struct shader_s	    *charsetMaterial; 
 
 	// Particle / decal media
 	struct shader_s		*particleTable[PT_PICTOTAL];
+	
+	// Temporary stuff
+	struct shader_s  	*bloodMarkMaterials[2][9];
+	struct shader_s	    *bulletMetalMarkMaterial;
+
+	// Misc media
+	struct shader_s	    *powerScreenShellMaterial;
+	struct shader_s	    *genericShellMaterial;
 
 	// Files referenced by the server that the client needs
-	struct sfx_s	*gameSounds[MAX_SOUNDS];
-	struct model_s	*gameModels[MAX_MODELS];
-	struct cmodel_s	*gameCModels[MAX_MODELS];
-	struct shader_s	*gameMaterials[MAX_IMAGES];
+	struct sfx_s	    *gameSounds[MAX_SOUNDS];
+	struct model_s	    *gameModels[MAX_MODELS];
+	struct cmodel_s	    *gameCModels[MAX_MODELS];
+	struct shader_s	    *gameMaterials[MAX_IMAGES];
 } clMedia_t;
 
 extern clMedia_t	clMedia;
@@ -213,9 +228,6 @@ extern clMedia_t	clMedia;
 // ===========================================================================
 
 typedef struct {
-	struct sfx_s	*sfxMachinegunBrass;
-	struct sfx_s	*sfxShotgunBrass;
-
 	// Shaders
 	struct shader_s	*levelshot;
 	struct shader_s	*levelshotDetail;
@@ -239,12 +251,6 @@ typedef struct {
 	struct shader_s	*nukeShockwaveShader;
 	struct shader_s	*bloodSplatShader[2];
 	struct shader_s	*bloodCloudShader[2];
-	struct shader_s	*powerScreenShellShader;
-	struct shader_s	*invulnerabilityShellShader;
-	struct shader_s	*quadDamageShellShader;
-	struct shader_s	*doubleDamageShellShader;
-	struct shader_s	*halfDamageShellShader;
-	struct shader_s	*genericShellShader;
 	struct shader_s	*laserBeamShader;
 	struct shader_s	*grappleBeamShader;
 	struct shader_s	*lightningBeamShader;
@@ -262,9 +268,7 @@ typedef struct {
 	struct shader_s	*trackerParticleShader;
 	struct shader_s	*flyParticleShader;
 	struct shader_s	*energyMarkShader;
-	struct shader_s	*bulletMarkShader;
 	struct shader_s	*burnMarkShader;
-	struct shader_s	*bloodMarkShaders[2][6];
 } gameMedia_t;
 
 typedef struct {
@@ -393,13 +397,6 @@ typedef enum {
 	CA_ACTIVE			// Game views should be displayed
 } connState_t;
 
-// The client precaches these files during initialization
-typedef struct {
-	struct shader_s	*whiteShader;
-	struct shader_s	*consoleShader;
-	struct shader_s	*charsetShader;
-} media_t;
-
 typedef struct {
 	char			map[MAX_QPATH];
 	char			name[MAX_QPATH];
@@ -423,8 +420,6 @@ typedef struct {
 
 	glConfig_t		glConfig;
 	alConfig_t		alConfig;
-
-	media_t			media;				// Precache
 
 	// Loading screen information
 	qboolean		loading;
@@ -679,7 +674,7 @@ void		CL_WaterSplash (const vec3_t org, const vec3_t dir);
 void		CL_ExplosionWaterSplash (const vec3_t org);
 void		CL_Sprite (const vec3_t org, float radius, struct shader_s *shader);
 void		CL_LaserBeam (const vec3_t start, const vec3_t end, int width, int color, byte alpha, int duration, struct shader_s *shader);
-void		CL_MachinegunEjectBrass (const centity_t *cent, int count, float x, float y, float z);
+void		CL_MachinegunEjectBrass (centity_t *cent, int count, float x, float y, float z);
 void		CL_ShotgunEjectBrass (const centity_t *cent, int count, float x, float y, float z);
 void		CL_Bleed (const vec3_t org, const vec3_t dir, int count, qboolean green);
 void		CL_BloodTrail (const vec3_t start, const vec3_t end, qboolean green);

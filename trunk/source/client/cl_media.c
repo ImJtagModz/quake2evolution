@@ -165,9 +165,21 @@ static void CL_SoundMediaInit ()
 
 	clMedia.sfx.mz2.tankRocketSfx		= S_RegisterSound ("tank/tnkatck1.wav");
 
-	// FIXME: Replace these
-	cl.media.sfxMachinegunBrass = S_RegisterSound("weapons/brass_bullet.wav");
-	cl.media.sfxShotgunBrass = S_RegisterSound("weapons/brass_shell.wav");
+	// Brass sounds
+	clMedia.sfx.machinegunBrass[0]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell1.wav");
+	clMedia.sfx.machinegunBrass[1]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell2.wav");
+	clMedia.sfx.machinegunBrass[2]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell3.wav");
+	clMedia.sfx.machinegunBrass[3]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell4.wav");
+	clMedia.sfx.machinegunBrass[4]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell5.wav");
+	clMedia.sfx.machinegunBrass[5]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell6.wav");
+	clMedia.sfx.machinegunBrass[6]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell7.wav");
+	clMedia.sfx.machinegunBrass[7]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell8.wav");
+	clMedia.sfx.machinegunBrass[8]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell9.wav");
+	clMedia.sfx.machinegunBrass[9]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell10.wav");
+	clMedia.sfx.machinegunBrass[10]				= S_RegisterSound ("#sounds/brass/bullet/machinegun_shell11.wav");
+	clMedia.sfx.shotgunBrass[0]		            = S_RegisterSound ("#sounds/brass/shell/shotgun_shell1.wav");
+	clMedia.sfx.shotgunBrass[1]		            = S_RegisterSound ("#sounds/brass/shell/shotgun_shell2.wav");
+	clMedia.sfx.shotgunBrass[2]		            = S_RegisterSound ("#sounds/brass/shell/shotgun_shell3.wav");
 
 	// Register the sounds that the server references
 	CL_UpdateLoading ("GAME SOUNDS");
@@ -258,15 +270,37 @@ static void CL_GFXMediaInit ()
 	clMedia.particleTable[PT_SMOKE1]		= R_RegisterShader ("particles/smoke1");
 	clMedia.particleTable[PT_SMOKE2]		= R_RegisterShader ("particles/smoke2");
 	clMedia.particleTable[PT_SMOKE3]		= R_RegisterShader ("particles/smoke3");
-
 	clMedia.particleTable[PT_SMOKE4]		= R_RegisterShader ("particles/smoke4");
-	clMedia.particleTable[PT_SMOKE5]		= R_RegisterShader ("particles/smoke5");
 
 	clMedia.particleTable[PT_FIRE1]		    = R_RegisterShader ("particles/fire1");
 	clMedia.particleTable[PT_FIRE2]		    = R_RegisterShader ("particles/fire2");
 	clMedia.particleTable[PT_FIRE3]		    = R_RegisterShader ("particles/fire3");
 
 	clMedia.particleTable[PT_SPARK]		    = R_RegisterShader ("particles/spark");
+
+	clMedia.particleTable[PT_BUBBLE]		= R_RegisterShader ("particles/bubble");
+
+	// Load temporarily decals
+	clMedia.bloodMarkMaterials[0][0]        = R_RegisterShader ("gfx/decals/blood_splat_1");
+	clMedia.bloodMarkMaterials[0][1]        = R_RegisterShader ("gfx/decals/blood_splat_2");
+	clMedia.bloodMarkMaterials[0][2]        = R_RegisterShader ("gfx/decals/blood_splat_3");
+	clMedia.bloodMarkMaterials[0][3]        = R_RegisterShader ("gfx/decals/blood_splat_4");
+	clMedia.bloodMarkMaterials[0][4]        = R_RegisterShader ("gfx/decals/blood_splat_5");
+	clMedia.bloodMarkMaterials[0][5]        = R_RegisterShader ("gfx/decals/blood_splat_6");
+	clMedia.bloodMarkMaterials[0][6]        = R_RegisterShader ("gfx/decals/blood_splat_7");
+	clMedia.bloodMarkMaterials[0][7]        = R_RegisterShader ("gfx/decals/blood_splat_8");
+	clMedia.bloodMarkMaterials[0][8]        = R_RegisterShader ("gfx/decals/blood_splat_9");
+	clMedia.bloodMarkMaterials[1][0]        = R_RegisterShader ("gfx/decals/blood_green_splat_1");
+	clMedia.bloodMarkMaterials[1][1]        = R_RegisterShader ("gfx/decals/blood_green_splat_2");
+	clMedia.bloodMarkMaterials[1][2]        = R_RegisterShader ("gfx/decals/blood_green_splat_3");
+	clMedia.bloodMarkMaterials[1][3]        = R_RegisterShader ("gfx/decals/blood_green_splat_4");
+	clMedia.bloodMarkMaterials[1][4]        = R_RegisterShader ("gfx/decals/blood_green_splat_5");
+	clMedia.bloodMarkMaterials[1][5]        = R_RegisterShader ("gfx/decals/blood_green_splat_6");
+	clMedia.bloodMarkMaterials[1][6]        = R_RegisterShader ("gfx/decals/blood_green_splat_7");
+	clMedia.bloodMarkMaterials[1][7]        = R_RegisterShader ("gfx/decals/blood_green_splat_8");
+	clMedia.bloodMarkMaterials[1][8]        = R_RegisterShader ("gfx/decals/blood_green_splat_9");
+
+	clMedia.bulletMetalMarkMaterial         = R_RegisterShader("gfx/decals/bullet_metal");
 }
 
 /*
@@ -327,6 +361,18 @@ static void CL_PicMediaInit ()
 }
 
 /*
+ ==================
+ CL_MiscMediaInit
+ ==================
+*/
+static void CL_MiscMediaInit ()
+{
+	// Shells
+	clMedia.powerScreenShellMaterial         = R_RegisterShaderSkin ("gfx/effects/shells/powerScreen");
+	clMedia.genericShellMaterial             = R_RegisterShaderSkin ("gfx/effects/shells/generic");
+}
+
+/*
  =================
  CL_RegisterGraphics
  =================
@@ -355,13 +401,6 @@ static void CL_RegisterGraphics (void){
 	cl.media.bloodCloudShader[0] = R_RegisterShader("bloodCloud");
 	cl.media.bloodCloudShader[1] = R_RegisterShader("greenBloodCloud");
 
-	cl.media.powerScreenShellShader = R_RegisterShaderSkin("shells/powerScreen");
-	cl.media.invulnerabilityShellShader = R_RegisterShaderSkin("shells/invulnerability");
-	cl.media.quadDamageShellShader = R_RegisterShaderSkin("shells/quadDamage");
-	cl.media.doubleDamageShellShader = R_RegisterShaderSkin("shells/doubleDamage");
-	cl.media.halfDamageShellShader = R_RegisterShaderSkin("shells/halfDamage");
-	cl.media.genericShellShader = R_RegisterShaderSkin("shells/generic");
-
 	cl.media.laserBeamShader = R_RegisterShader("beams/laser");
 	cl.media.grappleBeamShader = R_RegisterShader("beams/grapple");
 	cl.media.lightningBeamShader = R_RegisterShader("beams/lightning");
@@ -381,20 +420,7 @@ static void CL_RegisterGraphics (void){
 	cl.media.flyParticleShader = R_RegisterShader("particles/fly");
 
 	cl.media.energyMarkShader = R_RegisterShader("decals/energyMark");
-	cl.media.bulletMarkShader = R_RegisterShader("decals/bulletMark");
 	cl.media.burnMarkShader = R_RegisterShader("decals/burnMark");
-	cl.media.bloodMarkShaders[0][0] = R_RegisterShader("decals/bloodMark1");
-	cl.media.bloodMarkShaders[0][1] = R_RegisterShader("decals/bloodMark2");
-	cl.media.bloodMarkShaders[0][2] = R_RegisterShader("decals/bloodMark3");
-	cl.media.bloodMarkShaders[0][3] = R_RegisterShader("decals/bloodMark4");
-	cl.media.bloodMarkShaders[0][4] = R_RegisterShader("decals/bloodMark5");
-	cl.media.bloodMarkShaders[0][5] = R_RegisterShader("decals/bloodMark6");
-	cl.media.bloodMarkShaders[1][0] = R_RegisterShader("decals/greenBloodMark1");
-	cl.media.bloodMarkShaders[1][1] = R_RegisterShader("decals/greenBloodMark2");
-	cl.media.bloodMarkShaders[1][2] = R_RegisterShader("decals/greenBloodMark3");
-	cl.media.bloodMarkShaders[1][3] = R_RegisterShader("decals/greenBloodMark4");
-	cl.media.bloodMarkShaders[1][4] = R_RegisterShader("decals/greenBloodMark5");
-	cl.media.bloodMarkShaders[1][5] = R_RegisterShader("decals/greenBloodMark6");
 }
 
 /*
@@ -470,14 +496,14 @@ void CL_DrawLoading (void)
 
 		if (Com_ServerState()){
 			Q_snprintfz(str, sizeof(str), "Starting up...");
-			CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 		else {
 			if (cls.serverMessage[0])
-				CL_DrawString(0, 360, 16, 16, 0, 0, 640, cls.serverMessage, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+				CL_DrawString(0, 360, 16, 16, 0, 0, 640, cls.serverMessage, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 
 			Q_snprintfz(str, sizeof(str), "Connecting to %s\nAwaiting connection... %i", cls.serverName, cls.connectCount);
-			CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 
 		break;
@@ -488,14 +514,14 @@ void CL_DrawLoading (void)
 
 		if (Com_ServerState()){
 			Q_snprintfz(str, sizeof(str), "Starting up...");
-			CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 		else {
 			if (cls.serverMessage[0])
-				CL_DrawString(0, 360, 16, 16, 0, 0, 640, cls.serverMessage, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+				CL_DrawString(0, 360, 16, 16, 0, 0, 640, cls.serverMessage, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 
 			Q_snprintfz(str, sizeof(str), "Connecting to %s\nAwaiting challenge... %i", cls.serverName, cls.connectCount);
-			CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 
 		break;
@@ -512,11 +538,11 @@ void CL_DrawLoading (void)
 
 			if (Com_ServerState()){
 				Q_snprintfz(str, sizeof(str), "Downloading %s... (%.2f KB/sec)", cls.downloadName, speed);
-				CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+				CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 			}
 			else {
 				Q_snprintfz(str, sizeof(str), "Connecting to %s\nDownloading %s... (%.2f KB/sec)", cls.serverName, cls.downloadName, speed);
-				CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+				CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 			}
 
 			percent = Clamp(cls.downloadPercent - (cls.downloadPercent % 5), 5, 100);
@@ -535,11 +561,11 @@ void CL_DrawLoading (void)
 
 		if (Com_ServerState()){
 			Q_snprintfz(str, sizeof(str), "Starting up...");
-			CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 		else {
 			Q_snprintfz(str, sizeof(str), "Connecting to %s\nAwaiting game state...", cls.serverName);
-			CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 408, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 
 		break;
@@ -551,11 +577,11 @@ void CL_DrawLoading (void)
 
 		if (Com_ServerState()){
 			Q_snprintfz(str, sizeof(str), "Loading %s\n\"%s\"\n\n\nLoading... %s\n", cls.loadingInfo.map, cls.loadingInfo.name, cls.loadingInfo.string);
-			CL_DrawString(0, 360, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 360, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 		else {
 			Q_snprintfz(str, sizeof(str), "Loading %s\n\"%s\"\n\nConnecting to %s\nLoading... %s\n", cls.loadingInfo.map, cls.loadingInfo.name, cls.serverName, cls.loadingInfo.string);
-			CL_DrawString(0, 360, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+			CL_DrawString(0, 360, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 		}
 
 		percent = Clamp((cls.loadingInfo.percent / 5) - 1, 0, 19);
@@ -573,7 +599,7 @@ void CL_DrawLoading (void)
 		CL_DrawPic(0, 0, 640, 160, colorWhite, cl.media.loadingLogo);
 
 		Q_snprintfz(str, sizeof(str), "Awaiting frame...");
-		CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
+		CL_DrawString(0, 424, 16, 16, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER|DSF_UPPERCASE);
 
 		break;
 	case CA_ACTIVE:
@@ -748,6 +774,7 @@ void CL_LoadGameMedia (void){
 	CL_ModelMediaInit ();
 	CL_GFXMediaInit ();
 	CL_PicMediaInit ();
+	CL_MiscMediaInit ();
 
 	// Q2e´s
 	CL_RegisterGraphics();
@@ -786,10 +813,10 @@ void CL_LoadLocalMedia (void){
 	cls.screenScaleX = cls.glConfig.videoWidth / 640.0;
 	cls.screenScaleY = cls.glConfig.videoHeight / 480.0;
 
-	// Load a few needed shaders
-	cls.media.whiteShader = R_RegisterShaderNoMip("white");
-	cls.media.consoleShader = R_RegisterShaderNoMip("console");
-	cls.media.charsetShader = R_RegisterShaderNoMip("charset");
+	// Load a few needed materials
+	clMedia.whiteMaterial         = R_RegisterShaderNoMip ("white");
+	clMedia.consoleMaterial       = R_RegisterShaderNoMip ("console");
+	clMedia.charsetMaterial       = R_RegisterShaderNoMip ("charset");
 
 	// Precache UI files if requested
 	UI_Precache();

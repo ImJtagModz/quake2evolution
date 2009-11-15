@@ -866,9 +866,9 @@ static void CL_DrawLayoutString (const char *string, int x, int y, int centerWid
 			x = margin;
 
 		if (xor)
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, line, colorGreen, cls.media.charsetShader, false, DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, line, colorGreen, clMedia.charsetMaterial, false, DSF_LEFT);
 		else
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, line, colorWhite, cls.media.charsetShader, false, DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, line, colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
 
 		if (*string){
 			string++;	// Skip the \n
@@ -1000,10 +1000,10 @@ static void CL_ExecuteLayoutString (char *string){
 
 			CL_DrawPicFixed(x, y, ci->icon);
 
-			CL_DrawString(x+32, y, 8, 8, 0, 0, 0, ci->name, colorGreen, cls.media.charsetShader, false, DSF_LEFT);
-			CL_DrawString(x+32, y+8, 8, 8, 0, 0, 0, va("Score:  %i", score), colorWhite, cls.media.charsetShader, false, DSF_LEFT);
-			CL_DrawString(x+32, y+16, 8, 8, 0, 0, 0, va("Ping:  %i", ping), colorWhite, cls.media.charsetShader, false, DSF_LEFT);
-			CL_DrawString(x+32, y+24, 8, 8, 0, 0, 0, va("Time:  %i", time), colorWhite, cls.media.charsetShader, false, DSF_LEFT);
+			CL_DrawString(x+32, y, 8, 8, 0, 0, 0, ci->name, colorGreen, clMedia.charsetMaterial, false, DSF_LEFT);
+			CL_DrawString(x+32, y+8, 8, 8, 0, 0, 0, va("Score:  %i", score), colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
+			CL_DrawString(x+32, y+16, 8, 8, 0, 0, 0, va("Ping:  %i", ping), colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
+			CL_DrawString(x+32, y+24, 8, 8, 0, 0, 0, va("Time:  %i", time), colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
 			continue;
 		}
 		if (!Q_stricmp(token, "ctf")){
@@ -1033,9 +1033,9 @@ static void CL_ExecuteLayoutString (char *string){
 			Q_snprintfz(block, sizeof(block), "%3d %3d %-12.12s", score, ping, ci->name);
 
 			if (value+1 == cl.clientNum)
-				CL_DrawString(x, y, 8, 8, 0, 0, 0, block, colorGreen, cls.media.charsetShader, false, DSF_LEFT);
+				CL_DrawString(x, y, 8, 8, 0, 0, 0, block, colorGreen, clMedia.charsetMaterial, false, DSF_LEFT);
 			else
-				CL_DrawString(x, y, 8, 8, 0, 0, 0, block, colorWhite, cls.media.charsetShader, false, DSF_LEFT);
+				CL_DrawString(x, y, 8, 8, 0, 0, 0, block, colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
 
 			continue;
 		}
@@ -1132,17 +1132,17 @@ static void CL_ExecuteLayoutString (char *string){
 			if (index < 0 || index >= MAX_CONFIGSTRINGS)
 				Com_Error(ERR_DROP, "CL_ExecuteLayoutString: bad stat_string index %i", index);
 
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, cl.configStrings[index], colorWhite, cls.media.charsetShader, false, DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, cl.configStrings[index], colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
 			continue;
 		}
 		if (!Q_stricmp(token, "string")){
 			token = Com_Parse(&string);
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, token, colorWhite, cls.media.charsetShader, false, DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, token, colorWhite, clMedia.charsetMaterial, false, DSF_LEFT);
 			continue;
 		}
 		if (!Q_stricmp(token, "string2")){
 			token = Com_Parse(&string);
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, token, colorGreen, cls.media.charsetShader, false, DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, token, colorGreen, clMedia.charsetMaterial, false, DSF_LEFT);
 			continue;
 		}
 		if (!Q_stricmp(token, "cstring")){
@@ -1303,8 +1303,8 @@ static void CL_DrawInventory (void){
 
 	y += 24;
 	x += 24;
-	CL_DrawString(x, y, 8, 8, 0, 0, 0, "hotkey ### item", colorWhite, cls.media.charsetShader, false, DSF_FORCECOLOR|DSF_LEFT);
-	CL_DrawString(x, y+8, 8, 8, 0, 0, 0, "------ --- ----", colorWhite, cls.media.charsetShader, false, DSF_FORCECOLOR|DSF_LEFT);
+	CL_DrawString(x, y, 8, 8, 0, 0, 0, "hotkey ### item", colorWhite, clMedia.charsetMaterial, false, DSF_FORCECOLOR|DSF_LEFT);
+	CL_DrawString(x, y+8, 8, 8, 0, 0, 0, "------ --- ----", colorWhite, clMedia.charsetMaterial, false, DSF_FORCECOLOR|DSF_LEFT);
 	y += 16;
 	for (i = top; i < num && i < top+DISPLAY_ITEMS; i++){
 		item = index[i];
@@ -1321,13 +1321,13 @@ static void CL_DrawInventory (void){
 
 		Q_snprintfz(string, sizeof(string), "%6s %3i %s", bind, cl.inventory[item], cl.configStrings[CS_ITEMS+item]);
 		if (item != selected)
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, string, colorGreen, cls.media.charsetShader, false, DSF_FORCECOLOR|DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, string, colorGreen, clMedia.charsetMaterial, false, DSF_FORCECOLOR|DSF_LEFT);
 		else {	
 			// Draw a blinky cursor by the selected item
 			if ((cls.realTime >> 8) & 1)
-				CL_DrawString(x-8, y, 8, 8, 0, 0, 0, "\15", colorWhite, cls.media.charsetShader, false, DSF_FORCECOLOR|DSF_LEFT);
+				CL_DrawString(x-8, y, 8, 8, 0, 0, 0, "\15", colorWhite, clMedia.charsetMaterial, false, DSF_FORCECOLOR|DSF_LEFT);
 
-			CL_DrawString(x, y, 8, 8, 0, 0, 0, string, colorWhite, cls.media.charsetShader, false, DSF_FORCECOLOR|DSF_LEFT);
+			CL_DrawString(x, y, 8, 8, 0, 0, 0, string, colorWhite, clMedia.charsetMaterial, false, DSF_FORCECOLOR|DSF_LEFT);
 		}
 		
 		y += 8;
@@ -1559,7 +1559,7 @@ static void CL_DrawCrosshair (void){
 		}
 
 		// Draw it
-		CL_DrawString(0, (y+(h*2)) / cls.screenScaleY, 10, 10, 0, 0, 640, ci->name, fadeColor, cls.media.charsetShader, true, DSF_DROPSHADOW|DSF_CENTER);
+		CL_DrawString(0, (y+(h*2)) / cls.screenScaleY, 10, 10, 0, 0, 640, ci->name, fadeColor, clMedia.charsetMaterial, true, DSF_DROPSHADOW|DSF_CENTER);
 	}
 }
 
@@ -1576,7 +1576,7 @@ static void CL_DrawCenterString (void){
 	if (!fadeColor)
 		return;
 
-	CL_DrawString(0, 160, 10, 10, 0, 0, 640, cl.centerPrint, fadeColor, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 160, 10, 10, 0, 0, 640, cl.centerPrint, fadeColor, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 }
 
 /*
@@ -1609,7 +1609,7 @@ static void CL_DrawLagometer (void){
 		c = (cl.lagometer.current - 1 - i) & (LAG_SAMPLES-1);
 
 		if (cl.lagometer.dropped[c]){
-			R_DrawStretchPic(x+w - i, y, 1, h, 0, 0, 1, 1, colorRed, cls.media.whiteShader);
+			R_DrawStretchPic(x+w - i, y, 1, h, 0, 0, 1, 1, colorRed, clMedia.whiteMaterial);
 			continue;
 		}
 
@@ -1618,9 +1618,9 @@ static void CL_DrawLagometer (void){
 			v = h;
 
 		if (cl.lagometer.suppressed[c])
-			R_DrawStretchPic(x+w - i, y+h - v, 1, v, 0, 0, 1, 1, colorYellow, cls.media.whiteShader);
+			R_DrawStretchPic(x+w - i, y+h - v, 1, v, 0, 0, 1, 1, colorYellow, clMedia.whiteMaterial);
 		else
-			R_DrawStretchPic(x+w - i, y+h - v, 1, v, 0, 0, 1, 1, colorGreen, cls.media.whiteShader);
+			R_DrawStretchPic(x+w - i, y+h - v, 1, v, 0, 0, 1, 1, colorGreen, clMedia.whiteMaterial);
 	}
 
 	// Also draw the ping at the top
@@ -1631,11 +1631,11 @@ static void CL_DrawLagometer (void){
 	Q_snprintfz(str, sizeof(str), "%i", c);
 
 	if (c < 200)
-		CL_DrawString(592, 432, 10, 10, 0, 0, 48, str, colorGreen, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+		CL_DrawString(592, 432, 10, 10, 0, 0, 48, str, colorGreen, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 	else if (c < 400)
-		CL_DrawString(592, 432, 10, 10, 0, 0, 48, str, colorYellow, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+		CL_DrawString(592, 432, 10, 10, 0, 0, 48, str, colorYellow, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 	else
-		CL_DrawString(592, 432, 10, 10, 0, 0, 48, str, colorRed, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+		CL_DrawString(592, 432, 10, 10, 0, 0, 48, str, colorRed, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 }
 
 /*
@@ -1652,7 +1652,7 @@ static void CL_DrawDisconnected (void){
 	if (cls.netChan.outgoingSequence - cls.netChan.incomingAcknowledged < CMD_BACKUP-1)
 		return;
 
-	CL_DrawString(0, 100, 16, 16, 0, 0, 640, "Connection Interrupted", colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 100, 16, 16, 0, 0, 640, "Connection Interrupted", colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 
 	// Blink the icon
 	if ((cl.time >> 9) & 1)
@@ -1674,7 +1674,7 @@ static void CL_DrawRecording (void){
 		return;
 
 	Q_snprintfz(str, sizeof(str), "Recording: %s (%i KB)", cls.demoName, FS_Tell(cls.demoFile) / 1024);
-	CL_DrawString(0, 120, 10, 10, 0, 0, 640, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 120, 10, 10, 0, 0, 640, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 }
 
 /*
@@ -1713,7 +1713,7 @@ static void CL_DrawFPS (void){
 	fps = 1000 * FPS_FRAMES / total;
 
 	Q_snprintfz(str, sizeof(str), "%3i FPS", fps);
-	CL_DrawString(0, 0, 16, 16, 0, 0, 624, str, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_RIGHT);
+	CL_DrawString(0, 0, 16, 16, 0, 0, 624, str, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_RIGHT);
 }
 
 /*
@@ -1756,13 +1756,13 @@ static void CL_ShowShader (void){
 			return;
 	}
 
-	CL_DrawString(0, 300, 10, 10, 0, 0, 640, "SHADER", colorGreen, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
-	CL_DrawString(0, 322, 10, 10, 0, 0, 640, "SURFACE FLAGS", colorGreen, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
-	CL_DrawString(0, 344, 10, 10, 0, 0, 640, "CONTENTS FLAGS", colorGreen, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 300, 10, 10, 0, 0, 640, "SHADER", colorGreen, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 322, 10, 10, 0, 0, 640, "SURFACE FLAGS", colorGreen, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 344, 10, 10, 0, 0, 640, "CONTENTS FLAGS", colorGreen, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 
 	// Shader
 	Q_snprintfz(string, sizeof(string), "textures/%s", trace.surface->name);
-	CL_DrawString(0, 310, 10, 10, 0, 0, 640, string, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+	CL_DrawString(0, 310, 10, 10, 0, 0, 640, string, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 
 	// Surface flags
 	if (trace.surface->flags){
@@ -1787,7 +1787,7 @@ static void CL_ShowShader (void){
 
 		string[strlen(string)-1] = 0;
 
-		CL_DrawString(0, 332, 10, 10, 0, 0, 640, string, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+		CL_DrawString(0, 332, 10, 10, 0, 0, 640, string, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 	}
 
 	// Contents flags
@@ -1859,7 +1859,7 @@ static void CL_ShowShader (void){
 
 		string[strlen(string)-1] = 0;
 
-		CL_DrawString(0, 354, 10, 10, 0, 0, 640, string, colorWhite, cls.media.charsetShader, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
+		CL_DrawString(0, 354, 10, 10, 0, 0, 640, string, colorWhite, clMedia.charsetMaterial, true, DSF_FORCECOLOR|DSF_DROPSHADOW|DSF_CENTER);
 	}
 }
 

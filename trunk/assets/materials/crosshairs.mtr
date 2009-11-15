@@ -1,0 +1,259 @@
+pics/crosshair1
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch1.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair2
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch2.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair3
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch3.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair4
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch4.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair5
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch5.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair6
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch6.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair7
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch7.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair8
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch8.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair9
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch9.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair10
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch10.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair11
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch11.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair12
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch12.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair13
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch13.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair14
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch14.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair15
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch15.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair16
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch16.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair17
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch17.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair18
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch18.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair19
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch19.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+pics/crosshair20
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         guis/crosshairs/ch20.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}

@@ -1,0 +1,30 @@
+gfx/effects/shells/powerScreen
+{
+	noShadows
+	cull none
+	deformVertexes wave 100 sin 1.0 0 0 0
+	{
+		map         gfx/effects/shells/powerscreen.tga
+		blendFunc           GL_ONE GL_ONE
+		tcGen               environment 
+		tcMod               rotate 30  
+		tcMod               scroll 0.1 0.1
+		rgbGen              entity		
+	}
+}
+
+
+gfx/effects/shells/generic
+{
+	noShadows
+	cull none
+	deformVertexes wave 100 sin 0.3 0 0 0
+	{
+		map         gfx/effects/shells/shell_generic.tga
+		blendFunc           GL_ONE GL_ONE
+		tcGen               environment 
+		tcMod               rotate 30  
+		tcMod               scroll 0.1 0.1
+		rgbGen              entity		
+	}
+}

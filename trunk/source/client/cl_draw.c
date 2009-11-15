@@ -229,7 +229,7 @@ void CL_DrawString (float x, float y, float w, float h, float offsetX, float off
 void CL_FillRect (float x, float y, float w, float h, const color_t color){
 
 	CL_ScaleCoords(&x, &y, &w, &h);
-	R_DrawStretchPic(x, y, w, h, 0, 0, 1, 1, color, cls.media.whiteShader);
+	R_DrawStretchPic(x, y, w, h, 0, 0, 1, 1, color, clMedia.whiteMaterial);
 }
 
 /*

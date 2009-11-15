@@ -1,0 +1,37 @@
+white
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         $whiteImage
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+
+charset
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         gfx/charset.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+console
+{
+	noMipmaps
+	noPicmip
+	noCompress
+	{
+		map         gfx/console.tga
+		blendFunc           GL_ONE GL_ONE		
+	}
+}

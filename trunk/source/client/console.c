@@ -993,8 +993,8 @@ static void Con_DrawString (int x, int y, const char *string, const color_t colo
 			col = (ch & 15) * 0.0625;
 			row = (ch >> 4) * 0.0625;
 
-			R_DrawStretchPic(x+1, y+2, 8, 16, col, row, col + 0.0625, row + 0.0625, colorBlack, cls.media.charsetShader);
-			R_DrawStretchPic(x, y, 8, 16, col, row, col + 0.0625, row + 0.0625, modulate, cls.media.charsetShader);
+			R_DrawStretchPic(x+1, y+2, 8, 16, col, row, col + 0.0625, row + 0.0625, colorBlack, clMedia.charsetMaterial);
+			R_DrawStretchPic(x, y, 8, 16, col, row, col + 0.0625, row + 0.0625, modulate, clMedia.charsetMaterial);
 		}
 
 		x += 8;
@@ -1149,8 +1149,8 @@ void Con_DrawConsole (void){
 	con.visibleLines = cls.glConfig.videoHeight * con.fraction;
 
 	// Draw the background
-	R_DrawStretchPic(0, 0, cls.glConfig.videoWidth, con.visibleLines, 0, 0, 1, 1, colorWhite, cls.media.consoleShader);
-	R_DrawStretchPic(0, con.visibleLines-3, cls.glConfig.videoWidth, 3, 0, 0, 1, 1, colorBlack, cls.media.whiteShader);
+	R_DrawStretchPic(0, 0, cls.glConfig.videoWidth, con.visibleLines, 0, 0, 1, 1, colorWhite, clMedia.consoleMaterial);
+	R_DrawStretchPic(0, con.visibleLines-3, cls.glConfig.videoWidth, 3, 0, 0, 1, 1, colorBlack, clMedia.whiteMaterial);
 
 	// Draw the version string
 	Con_DrawString(cls.glConfig.videoWidth-8-(strlen(Q2E_VERSION)*8), con.visibleLines-20, Q2E_VERSION, color);

@@ -1,0 +1,99 @@
+gfx/decals/blood_splat_1
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_1.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_2
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_2.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_3
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_3.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_4
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_4.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_5
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_5.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_6
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_6.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_7
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_7.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_8
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_8.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/blood_splat_9
+{
+	polygonOffset
+	{
+		map         gfx/decals/blood_splat_9.tga
+		blendFunc           GL_ZERO GL_ONE_MINUS_SRC_COLOR
+		rgbGen              vertex
+	}
+}
+
+gfx/decals/bullet_metal
+{
+	polygonOffset
+	{
+		map         gfx/decals/bullet_metal.tga
+		blendFunc           GL_DST_COLOR GL_SRC_COLOR
+		rgbGen              vertex
+	}
+}

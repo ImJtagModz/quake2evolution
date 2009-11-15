@@ -38,6 +38,7 @@ typedef enum {
 typedef struct {
 	entityType_t	entityType;
 	int				renderFX;
+	int				flags;
 
 	struct model_s	*model;			// Opaque type outside refresh
 
