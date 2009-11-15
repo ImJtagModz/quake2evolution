@@ -15,11 +15,20 @@ Features
   - Start rewrite the particle effects
 * Change icon texture
 * Add shadows from the player model
-
+ 
 Particel Effect Features
+* Explotion:
+  - I skiped embers for now since they arent really necessary
+* Blaster particles
+  - Maybe it could be a bit more like q2xp
+* CL_SmokePuffParticles
+  - Maybe needs another smoke texture
+
+* Instaid of calling 1000 cl_partilce cvars, find out a way to call it ONCE!  
+* Maybe its possible but half-life 2 does this: For some particle like
+explotion embers they remove and re-add them everytime a explotion happens so that they dont
+stack up on each other, taking huge framerate.
 * Doom 3 uses depthhack for some particles that makest them not cut on bsp
-* Doom 3 has a flag in direction called "outwards", it makes for example smoke
-go outwards from its origin
   - This would be a rendering flag, there is 3 steps for this and they are:
     - DEPTHHACK_RANGE_SHORT 
     - DEPTHHACK_RANGE_MID
@@ -29,6 +38,7 @@ Fixes
 * Remove menu and make console the "mainmenu" for now
   - Seems that UI_SetActiveMenu is the function that activates menu on startup
 * Fix brass origin with q2xp in muzzle flash code
+  - This (i think) needs to be rewritten the origin
 * The gravity on particles when you are lets say the flyer in vortex is fucked up
 * Alpha spawning monsters in vortex doenst work, i cant see them'
   - This has to do with ent.flags and RF_ / EF_ flags in CL_AddPacketEntities 
@@ -45,6 +55,12 @@ Optimizations
 in the parser function it self
 
 ==================================================
+Windows
+==================================================
+Features
+* Would be cool to have a startup window like q2xp but with a texture
+
+==================================================
 Not sure
 ==================================================
 Bugs
@@ -56,6 +72,7 @@ you have to force it to connect
 Crashes
 * I had a bad entityType in R_AddEntitiesToList on p_auth.
 * Shadows crashed on shader = surface->shaders[entity->skinNum].shader;, on that map p_auth.
+* The memory system fucking sucks, making the game crash because it cannot hunk more then X amount of memory!
 
 ==================================================
 SVN Comments
@@ -133,6 +150,7 @@ beams/laser
   
   
 Wanted Features List
+* Sound shaders
 * 3D HUD models (scrible?)
 * Material based blob shadows
 * Q3BSP format
@@ -152,6 +170,12 @@ Wanted Features List
 * Better r_speeds; fps, ping and map time counter
 * Better debug tools such as r_showtris
 * Anti-aliasing for the edges of polygons  
+* Move Client game stuff into its own dll? (cgame.dll)
+  - help Paril säger:
+     * (why EGL uses cgame.dll)
+     * so he doesn't have to compile three or four of them
+     * easier to have every game mode in one
+
 
 Wanted Misc Feature List
 * Better forum theme
@@ -190,3 +214,5 @@ ModDB
 */
 
 void		Q_snprintfz  
+
+Biig explotions, metal music and tons of gore. Thats my defenition of quake 2

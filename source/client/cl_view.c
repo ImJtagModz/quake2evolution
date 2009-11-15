@@ -585,7 +585,7 @@ static void CL_DrawViewBlends (void){
 
 		*(unsigned *)color = ColorBytes(cl.playerState->blend[0], cl.playerState->blend[1], cl.playerState->blend[2], cl.playerState->blend[3]);
 
-		R_DrawStretchPic(cl.refDef.x, cl.refDef.y, cl.refDef.width, cl.refDef.height, 0, 0, 1, 1, color, cls.media.whiteShader);
+		R_DrawStretchPic(cl.refDef.x, cl.refDef.y, cl.refDef.width, cl.refDef.height, 0, 0, 1, 1, color, clMedia.whiteMaterial);
 		return;
 	}
 
@@ -602,7 +602,7 @@ static void CL_DrawViewBlends (void){
 			}
 		}
 	}
-
+#if 0
 	// See if the player is underwater
 	if ((contents = CL_PointContents(cl.refDef.viewOrigin, -1)) & MASK_WATER){
 		if (!cl.underwaterMask){
@@ -619,7 +619,7 @@ static void CL_DrawViewBlends (void){
 			cl.underwaterMask = 0;
 		}
 	}
-
+#endif
 	// Blood blend
 	if (cl.damageTime){
 		fadeColor = CL_FadeBlend(cl.damageTime, 1000, 250, 750, 0.75);

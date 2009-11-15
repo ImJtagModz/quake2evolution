@@ -1,0 +1,44 @@
+textures/e1u1/wndow0_3
+{
+	sort blend
+	{
+		map         env/env_generic.tga
+		blendFunc           GL_ONE GL_ONE
+		tcGen               environment
+	}
+
+	{	
+		map         textures/e1u1/wndow0_3.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+	}
+}
+
+textures/e1u3/wndow0_3
+{
+	sort blend
+	{
+		map         env/env_generic.tga
+		blendFunc           GL_ONE GL_ONE
+		tcGen               environment
+	}
+
+	{	
+		map         textures/e1u3/wndow0_3.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+	}
+}
+
+textures/e3u1/wndow0_3
+{
+	sort blend
+	{
+		map         env/env_generic.tga
+		blendFunc           GL_ONE GL_ONE
+		tcGen               environment
+	}
+
+	{	
+		map         textures/e3u1/wndow0_3.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+	}
+}

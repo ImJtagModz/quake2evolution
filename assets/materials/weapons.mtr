@@ -1,0 +1,25 @@
+models/brass/bullet/bullet
+{
+	noShadows
+	{
+		map         models/brass/bullet/bullet.tga
+		rgbGen              lightingDiffuse
+	}
+
+	{
+		map         models/brass/bullet/bullet_env.tga
+		blendFunc           GL_DST_COLOR GL_ONE
+		rgbGen              lightingDiffuse
+		tcGen               environment
+		tcMod               scale 0.3 0.3
+	}
+}
+
+models/brass/shell/shell
+{
+	noShadows
+	{
+		map         models/brass/shell/shell.tga
+		rgbGen              lightingDiffuse
+	}
+}

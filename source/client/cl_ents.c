@@ -658,7 +658,7 @@ static void CL_AddShellEntity (entity_t *ent, unsigned effects, qboolean light){
 		return;
 
 	if (effects & EF_PENT){
-		ent->customShader = cl.media.invulnerabilityShellShader;
+		ent->customShader = clMedia.genericShellMaterial;
 		MakeRGBA(ent->shaderRGBA, 255, 0, 0, 75);
 
 		R_AddEntityToScene(ent);
@@ -668,7 +668,7 @@ static void CL_AddShellEntity (entity_t *ent, unsigned effects, qboolean light){
 	}
 
 	if (effects & EF_QUAD){
-		ent->customShader = cl.media.quadDamageShellShader;
+		ent->customShader = clMedia.genericShellMaterial;
 		MakeRGBA(ent->shaderRGBA, 0, 0, 255, 75);
 
 		R_AddEntityToScene(ent);
@@ -678,7 +678,7 @@ static void CL_AddShellEntity (entity_t *ent, unsigned effects, qboolean light){
 	}
 
 	if (effects & EF_DOUBLE){
-		ent->customShader = cl.media.doubleDamageShellShader;
+		ent->customShader = clMedia.genericShellMaterial;
 		MakeRGBA(ent->shaderRGBA, 230, 178, 0, 75);
 
 		R_AddEntityToScene(ent);
@@ -688,7 +688,7 @@ static void CL_AddShellEntity (entity_t *ent, unsigned effects, qboolean light){
 	}
 
 	if (effects & EF_HALF_DAMAGE){
-		ent->customShader = cl.media.halfDamageShellShader;
+		ent->customShader = clMedia.genericShellMaterial;
 		MakeRGBA(ent->shaderRGBA, 142, 150, 114, 75);
 
 		R_AddEntityToScene(ent);
@@ -698,7 +698,7 @@ static void CL_AddShellEntity (entity_t *ent, unsigned effects, qboolean light){
 	}
 
 	if (effects & EF_COLOR_SHELL){
-		ent->customShader = cl.media.genericShellShader;
+		ent->customShader = clMedia.genericShellMaterial;
 		MakeRGBA(ent->shaderRGBA, 0, 0, 0, 75);
 
 		VectorClear(rgb);
@@ -744,7 +744,7 @@ static void CL_AddEntityTrails (centity_t *cent, const vec3_t org, unsigned effe
 			R_AddLightToScene(org, 200, 0, 1, 0);
 		}
 		else {
-			CL_BlasterTrail(cent->lerpOrigin, org, 0.97, 0.46, 0.14);
+			CL_BlasterTrail(cent->lerpOrigin, org, 1.0f, 0.40f, 0.019f);
 			R_AddLightToScene(org, 200, 1, 1, 0);
 		}
 	}
@@ -881,7 +881,7 @@ void CL_AddPacketEntities (void){
 			if (state->effects & EF_ANIM_ALLFAST)
 			{
 				CL_Sprite(ent.origin, 25, cl.media.plasmaBallShader);
-				CL_BlasterTrail(cent->lerpOrigin, ent.origin, 0.97, 0.46, 0.14);
+				CL_BlasterTrail(cent->lerpOrigin, ent.origin, 1.0f, 0.40f, 0.019f);
 				R_AddLightToScene(ent.origin, 130, 1, 0.5, 0.5);
 			}
 
@@ -1064,7 +1064,7 @@ void CL_AddPacketEntities (void){
 			ent.model = clMedia.powerScreenModel;
             ent.frame = 0;
             ent.oldFrame = 0;
-			ent.customShader = cl.media.powerScreenShellShader;
+			ent.customShader = clMedia.powerScreenShellMaterial;
 			MakeRGBA(ent.shaderRGBA, 0, 255, 0, 75);
 
             R_AddEntityToScene(&ent);

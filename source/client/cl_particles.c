@@ -658,6 +658,7 @@ void CL_BlasterTrail (const vec3_t start, const vec3_t end, float r, float g, fl
 	if (!cl_particles->integer)
 		return;
 
+	// Sparks
 	Vec3Copy (start, move);
 	Vec3Subtract (end, start, vec);
 	len = VectorNormalize (vec);
@@ -672,12 +673,12 @@ void CL_BlasterTrail (const vec3_t start, const vec3_t end, float r, float g, fl
 		CL_SpawnParticle (
 			move[0] + crand (),					   move[1] + crand (),					   move[2] + crand (),
 			0,					                   0,				                       0,
-			crand () * 5,						   crand () * 5,					       crand () * 5,
+			crand () * 3,						   crand () * 3,					       crand () * 3,
 			0,					                   0,				                       0,
 			r,						               g,				                       b,
 			0,					                   0,				                       0,
 			PT_ENERGY,
-			1.0f,					               -1.0f / (0.3f + frand () * 0.2f), 
+			1.0f,					               -1.0f / (0.9f + frand () * 0.2f), 
 			2.4 + (1.2 * crand ()),				   -2.4f + (1.2f * crand ()),
 			0,
 			0,
@@ -716,7 +717,7 @@ void CL_RocketTrail (const vec3_t start, const vec3_t end)
 	Vec3Subtract (end, start, vec);
 	len = VectorNormalize (vec);
 
-	dist = 1.0f;
+	dist = 0.3f;
 	Vec3Scale (vec, dist, vec);
 
 	for (; len > 0; Vec3Add (move, vec, move))
@@ -731,8 +732,8 @@ void CL_RocketTrail (const vec3_t start, const vec3_t end)
 			1.0,					               1.0,				                       1.0,
 			0,					                   0,				                       0,
 			PT_FIRE1,
-			0.9f + (crand () * 0.1f),			   -1.0f / (0.25f + (crand () * 0.05f)),
-			3 + (1.5 * crand()),				   -6 + (3 * crand()),
+			0.9f + (crand () * 0.1f),			   -1.0f / (0.15f + (crand () * 0.05f)),
+			1.0 + (crand () * 2),				   8 + (frand () * 2),
 			0,
 			0,
 			frand () * 360,
@@ -766,12 +767,106 @@ void CL_RocketTrail (const vec3_t start, const vec3_t end)
 			0.75,					               0.75,				                   0.75,
 			PT_SMOKE1 + (rand () & 2), 
 			0.4f + (crand () * 0.1f),			   -8.9f / (1.0f + (3 * 10.0f) + (crand () * 0.15f)),
-			9 + (crand () * 4),					   40 + (frand () * 20),
+			8 + (crand () * 4),					   40 + (frand () * 20),
 			flags,
 			0,
 			frand () * 360,
 			1,                                     0,
 			pSmokeThink,						   NULL,								   NULL);
+	}
+}
+
+/*
+ ==================
+ CL_GrenadeTrail
+ ==================
+*/
+void CL_GrenadeTrail (const vec3_t start, const vec3_t end)
+{
+	vec3_t		move, vec;
+	float		len, dist;
+
+	if (!cl_particles->integer)
+		return;
+
+	// Check for water
+	if (CL_PointContents (end, -1) & MASK_WATER)
+	{
+		// Found it, so do a bubble trail
+		if (CL_PointContents (start, -1) & MASK_WATER)
+			CL_BubbleTrail (start, end, 16, 1);
+
+		return;
+	}
+	
+	// Smoke puffs
+	Vec3Copy (start, move);
+	Vec3Subtract (end, start, vec);
+	len = VectorNormalize (vec);
+
+	dist = 20;
+	Vec3Scale (vec, dist, vec);
+
+	for (; len > 0; Vec3Add (move, vec, move))
+	{
+		len -= dist;
+
+		CL_SpawnParticle (
+			move[0] + crand (),					   move[1] + crand (),					   move[2] + crand (),
+			0,					                   0,				                       0,
+			crand () * 5,						   crand () * 5,					       crand () * 5 + (25 + crand () * 5), 
+			0,					                   0,				                       0,
+			0.75,					               0.75,				                   0.75,
+			0,					                   0,				                       0,
+			PT_SMOKE1 + (rand () & 2), 
+			0.4f + (crand () * 0.1f),			   -8.9f / (1.0f + (3 * 10.0f) + (crand () * 0.15f)),
+			1 + (crand () * 4),					   0.5 + (frand () * 20),
+			PARTICLE_VERTEXLIGHT,
+			0,
+			frand () * 360,
+			1,                                     0,
+			pSmokeThink,						   NULL,								   NULL);
+	}
+}
+
+/*
+ ==================
+ CL_BubbleTrail
+ ==================
+*/
+void CL_BubbleTrail (const vec3_t start, const vec3_t end, float dist, float radius)
+{
+	vec3_t		move, vec;
+	float		len;
+
+	if (!cl_particles->integer)
+		return;
+
+	Vec3Copy (start, move);
+	Vec3Subtract (end, start, vec);
+	len = VectorNormalize (vec);
+
+	Vec3Scale(vec, dist, vec);
+
+	for (; len > 0; Vec3Add (move, vec, move))
+	{
+		len -= dist;
+
+		CL_SpawnParticle (
+			move[0] + crand (),					   move[1] + crand (),					   move[2] + crand (),
+			0,					                   0,				                       0,
+			crand () * 5,						   crand () * 5,					       crand () * 5 + (35 + crand () * 5), 
+			0,					                   0,				                       50,
+			1,					                   1,				                       1,
+			0,					                   0,				                       0,
+			PT_BUBBLE, 
+			1.0,			                       -(0.4 + frand() * 0.2),
+			radius + ((radius * 0.5) * crand()),   0,
+			PARTICLE_UNDERWATER,
+			0,
+			0,
+			1,                                     0,
+			NULL,						           NULL,								   NULL);
 	}
 }
 
@@ -838,6 +933,10 @@ void CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, 
 			1,                                     0,
 			NULL,								   NULL,								   NULL);
 	}
+
+	// Decal mark
+
+	// Impact wave
 }
 
 /*
@@ -847,18 +946,15 @@ void CL_BlasterParticles (const vec3_t org, const vec3_t dir, float r, float g, 
 */
 void CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolean inWater)
 {
-	// assume "origin" is origin of explosion
+	// Assume "origin" is origin of explosion
 	// and "org" is the particle's origin
-	float speed = 20.0f;
-	vec3_t sub, forward, velocity, origin;
-
-
+	vec3_t     sub, velocity, origin;
 	vec3_t     endPos, normal;
 	qboolean   decal;
-	float      distScale;
+	float      distScale, speed = 22.0f;
 	int        i, j, flags = 0;
 
-	// Explosion mark
+	// Decal mark
 	decal = CL_FindExplosionDir (org, 30 * scale, endPos, normal);
 	if (!decal)
 		Vec3Set (normal, 0, 0, 1);
@@ -889,6 +985,9 @@ void CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolea
 	if (cl_particleVertexLight->integer)
 		flags |= PARTICLE_VERTEXLIGHT;
 
+	if (cl_particleBounce->integer)
+		flags |= PARTICLE_BOUNCE;
+
 	// Upwards smoke
 	j = scale + 4;
 	for (i = 1; i < j; i++)
@@ -905,7 +1004,7 @@ void CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolea
 			0.2f,					               0.2f,				                   0.2f,
 			0,					                   0,				                       0,
 			PT_SMOKE1 + (rand () & 2),
-			0.5f,					               -0.2f,
+			0.8f,					               -0.5f,
 			65 + (crand () * 9.5f),				   35 + (crand () * 9.5f),
 			flags,
 			0,
@@ -927,29 +1026,22 @@ void CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolea
 			velocity[j] = sub[j] * -speed;
 
 		CL_SpawnParticle (
-			org[0],			   
-			org[1],			   
-			org[2],
+			org[0],			                       org[1],			                       org[2],
 			0,					                   0,				                       0,
 			velocity[0],					       velocity[1],				               velocity[2],
-			0,					                   0,				                       0,
+			0,					                   0,				                       5 + (crand () * 2),
 			0.2f,					               0.2f,				                   0.2f,
 			0,					                   0,				                       0,
-			PT_SMOKE1 + (rand () & 2),
-			0.5f,					               -0.2f,
+			PT_SMOKE1 + (rand () & 3),
+			0.8f,					               -0.5f,
 			35 + (crand () * 9.5f),				   25 + (crand () * 9.5f),
 			flags,
-			0,
+			0.01f,
 			frand () * 360,
 			1,                                     0,
 			pSmokeThink,						   NULL,								   NULL);
 	}
-
-	// Fire sparks
-
-	// Embers
 }
-
 
 /*
  ==================
@@ -958,14 +1050,13 @@ void CL_ExplosionParticles (vec3_t org, float scale, qboolean exploOnly, qboolea
 */
 void CL_BulletParticles (const vec3_t org, const vec3_t dir)
 {
-	cparticle_t	*p;
 	int			flags;
 	int			i, count;
 
 	if (!cl_particles->integer)
 		return;
 
-	count = 3 + (rand() % 5);
+	count = 10 + (rand() % 5);
 
 	// Check for water
 	if (CL_PointContents (org, -1) & MASK_WATER)
@@ -986,7 +1077,7 @@ void CL_BulletParticles (const vec3_t org, const vec3_t dir)
 	for (i = 0; i < count; i++)
 	{
 		CL_SpawnParticle (
-			org[0] + dir[0] * 2 + crand(),		   org[1] + dir[1] * 2 + crand(),          org[2] + dir[2] * 2 + crand(),
+			org[0] + dir[0] * 1 + crand (),		   org[1] + dir[1] * 1 + crand (),         org[2] + dir[2] * 1 + crand (),
 			0,					                   0,				                       0,
 			dir[0] * 180 + crand () * 60,		   dir[1] * 180 + crand () * 60,		   dir[2] * 180 + crand () * 60,
 			0,					                   0,				                       -120 + (60 * crand ()),
@@ -998,119 +1089,48 @@ void CL_BulletParticles (const vec3_t org, const vec3_t dir)
 			flags,
 			0.2f,
 			0,
-			11 + (4 * crand ()),                   11 + (4 * crand ()),
+			11 + (4 * crand () * 4),               11 + (4 * crand () * 4),
 			NULL,						           NULL,								   NULL);
 	}
+}
 
-#if 0
-	// Smoke
+/*
+ ==================
+ CL_BulletParticles
+ ==================
+*/
+void CL_SmokePuffParticles (const vec3_t org, float radius, int count)
+{
+	int     flags;
+	int		i;
+
 	flags = 0;
 
 	if (cl_particleVertexLight->integer)
 		flags |= PARTICLE_VERTEXLIGHT;
 
-	for (i = 0; i < 3; i++){
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.smokeParticleShader;
-		p->time = cl.time;
-		p->flags = flags;
-
-		p->org[0] = org[0] + dir[0] * 5 + crand();
-		p->org[1] = org[1] + dir[1] * 5 + crand();
-		p->org[2] = org[2] + dir[2] * 5 + crand();
-		p->vel[0] = crand() * 2.5;
-		p->vel[1] = crand() * 2.5;
-		p->vel[2] = crand() * 2.5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = 0.4;
-		p->color[1] = 0.4;
-		p->color[2] = 0.4;
-		p->colorVel[0] = 0.2;
-		p->colorVel[1] = 0.2;
-		p->colorVel[2] = 0.2;
-		p->alpha = 0.5;
-		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->size = 3 + (1.5 * crand());
-		p->sizeVel = 5 + (2.5 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = rand() % 360;
+	// Smoke puff
+	for (i = 0; i < count; i++)
+	{
+		CL_SpawnParticle (
+			org[0] + crand (),		               org[1] + crand (),                      org[2] + crand (),
+			0,					                   0,				                       0,
+			crand() * 5,		                   crand() * 5,		                       crand() * 5 + (25 + crand() * 5),
+			0,					                   0,				                       0,
+			0.4,					               0.4,				                       0.4,
+			0.75,					               0.75,				                   0.75,
+			PT_SMOKE1 + (rand () & 2),
+			0.5f ,			                       -(0.4 + frand() * 0.2),
+			radius + ((radius * 0.5) * crand()),   (radius * 2) + ((radius * 4) * crand()),
+			flags,
+			0,
+			frand() * 360,
+			1,                                     0,
+			pSmokeThink,						   NULL,								   NULL);
 	}
-#endif
 }
 
 // ===========================================================================
-
-/*
- =================
- CL_GrenadeTrail
- =================
-*/
-void CL_GrenadeTrail (const vec3_t start, const vec3_t end){
-
-	cparticle_t	*p;
-	vec3_t		move, vec;
-	float		len, dist;
-
-	if (!cl_particles->integer)
-		return;
-
-	if (CL_PointContents(end, -1) & MASK_WATER){
-		if (CL_PointContents(start, -1) & MASK_WATER)
-			CL_BubbleTrail(start, end, 16, 1);
-
-		return;
-	}
-	
-	VectorCopy(start, move);
-	VectorSubtract(end, start, vec);
-	len = VectorNormalize(vec);
-
-	dist = 20;
-	VectorScale(vec, dist, vec);
-
-	while (len > 0){
-		len -= dist;
-
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.liteSmokeParticleShader;
-		p->time = cl.time;
-		p->flags = 0;
-
-		p->org[0] = move[0] + crand();
-		p->org[1] = move[1] + crand();
-		p->org[2] = move[2] + crand();
-		p->vel[0] = crand() * 5;
-		p->vel[1] = crand() * 5;
-		p->vel[2] = crand() * 5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = 1.0;
-		p->color[1] = 1.0;
-		p->color[2] = 1.0;
-		p->colorVel[0] = 0;
-		p->colorVel[1] = 0;
-		p->colorVel[2] = 0;
-		p->alpha = 0.5;
-		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->size = 3 + (1.5 * crand());
-		p->sizeVel = 3 + (1.5 * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = rand() % 360;
-
-		VectorAdd(move, vec, move);
-	}
-}
 
 /*
  =================
@@ -1556,64 +1576,6 @@ void CL_TagTrail (const vec3_t start, const vec3_t end){
 
 /*
  =================
- CL_BubbleTrail
- =================
-*/
-void CL_BubbleTrail (const vec3_t start, const vec3_t end, float dist, float radius){
-
-	cparticle_t	*p;
-	vec3_t		move, vec;
-	float		len;
-
-	if (!cl_particles->integer)
-		return;
-
-	VectorCopy(start, move);
-	VectorSubtract(end, start, vec);
-	len = VectorNormalize(vec);
-
-	VectorScale(vec, dist, vec);
-
-	while (len > 0){
-		len -= dist;
-
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.bubbleParticleShader;
-		p->time = cl.time;
-		p->flags = PARTICLE_UNDERWATER;
-
-		p->org[0] = move[0] + crand();
-		p->org[1] = move[1] + crand();
-		p->org[2] = move[2] + crand();
-		p->vel[0] = crand() * 5;
-		p->vel[1] = crand() * 5;
-		p->vel[2] = crand() * 5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = 1;
-		p->color[1] = 1;
-		p->color[2] = 1;
-		p->colorVel[0] = 0;
-		p->colorVel[1] = 0;
-		p->colorVel[2] = 0;
-		p->alpha = 1.0;
-		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->size = radius + ((radius * 0.5) * crand());
-		p->sizeVel = 0;
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = 0;
-
-		VectorAdd(move, vec, move);
-	}
-}
-
-/*
- =================
  CL_FlagTrail
  =================
 */
@@ -1822,56 +1784,6 @@ void CL_TrackerExplosionParticles (const vec3_t org){
 		p->bounceFactor = 0.7;
 
 		VectorCopy(p->org, p->lastOrg);
-	}
-}
-
-/*
- =================
- CL_SmokePuffParticles
- =================
-*/
-void CL_SmokePuffParticles (const vec3_t org, float radius, int count){
-
-	cparticle_t	*p;
-	int			flags;
-	int			i;
-
-	flags = 0;
-
-	if (cl_particleVertexLight->integer)
-		flags |= PARTICLE_VERTEXLIGHT;
-
-	for (i = 0; i < count; i++){
-		p = CL_AllocParticle();
-		if (!p)
-			return;
-
-		p->shader = cl.media.smokeParticleShader;
-		p->time = cl.time;
-		p->flags = flags;
-
-		p->org[0] = org[0] + crand();
-		p->org[1] = org[1] + crand();
-		p->org[2] = org[2] + crand();
-		p->vel[0] = crand() * 5;
-		p->vel[1] = crand() * 5;
-		p->vel[2] = crand() * 5 + (25 + crand() * 5);
-		p->accel[0] = 0;
-		p->accel[1] = 0;
-		p->accel[2] = 0;
-		p->color[0] = 0.4;
-		p->color[1] = 0.4;
-		p->color[2] = 0.4;
-		p->colorVel[0] = 0.75;
-		p->colorVel[1] = 0.75;
-		p->colorVel[2] = 0.75;
-		p->alpha = 0.5;
-		p->alphaVel = -(0.4 + frand() * 0.2);
-		p->size = radius + ((radius * 0.5) * crand());
-		p->sizeVel = (radius * 2) + ((radius * 4) * crand());
-		p->length = 1;
-		p->lengthVel = 0;
-		p->rotation = rand() % 360;
 	}
 }
 

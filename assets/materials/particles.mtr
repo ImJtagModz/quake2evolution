@@ -1,0 +1,154 @@
+particles/energy
+{
+	{
+		map         gfx/particles/energy.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex		
+	}
+}
+
+particles/smoke1
+{
+	{
+		map         gfx/particles/smoke1.tga
+		blendFunc           blend
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/smoke2
+{
+	{
+		map         gfx/particles/smoke2.tga
+		blendFunc           blend
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/smoke3
+{
+	{
+		map         gfx/particles/smoke3.tga
+		blendFunc           blend
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/smoke4
+{
+	{
+		map         gfx/particles/smoke4.tga
+		blendFunc           blend
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/fire1
+{
+	{
+		map         gfx/particles/fire1.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/fire2
+{
+	{
+		map         gfx/particles/fire2.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+
+particles/fire3
+{
+	{
+		map         gfx/particles/fire3.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/fire_spark
+{
+	{
+		map         gfx/particles/fire_spark.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/spark
+{
+	{
+		map         gfx/particles/spark.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+particles/bubble
+{
+	sort underwater
+	{
+		map         gfx/particles/bubble.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+gfx/particles/liteSmoke
+{
+	{
+		map         gfx/particles/litesmoke.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+gfx/particles/steam
+{
+	{
+		map         gfx/particles/steam.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE
+		rgbGen              vertex
+		alphaGen            vertex
+	}
+}
+
+gfx/particles/fly
+{
+	{
+		animFrequency 20
+		map         gfx/particles/fly_1.tga
+		map         gfx/particles/fly_2.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              wave inverseSawtooth 0 1 0 2
+		alphaGen            vertex
+	}
+
+	{
+		animFrequency 20
+		map         gfx/particles/fly_1.tga
+		map         gfx/particles/fly_2.tga
+		blendFunc           GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen              wave sawtooth 0 1 0 2
+		alphaGen            vertex
+	}
+}
+
+*/

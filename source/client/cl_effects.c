@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 //
-// cl_media.c
+// cl_effects.c
 //
 
 #include "cl_local.h"
@@ -74,7 +74,7 @@ void CL_ParsePlayerMuzzleFlash ()
 	case MZ_CHAINGUN1:
 	case MZ_CHAINGUN2:
 	case MZ_CHAINGUN3:
-		CL_MachinegunEjectBrass (cent, 1, 10, -8, 18);
+//		CL_MachinegunEjectBrass (cent, 1, 10, -8, 18);
 		break;
 	}
 
@@ -99,7 +99,7 @@ void CL_ParsePlayerMuzzleFlash ()
 
 	// MZ_MACHINEGUN
 	case MZ_MACHINEGUN:
-		CL_MachinegunEjectBrass (cent, 1, 15, -8, 18);
+		//CL_MachinegunEjectBrass (cent, 1, 15, -8, 18);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz.machineGunSfx[(rand () % 5)], volume, ATTN_NORM, 0);
 		break;
@@ -296,7 +296,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_INFANTRY_MACHINEGUN_11:
 	case MZ2_INFANTRY_MACHINEGUN_12:
 	case MZ2_INFANTRY_MACHINEGUN_13:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		//CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.machGunSfx, 1, ATTN_NORM, 0);
@@ -311,7 +311,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_SOLDIER_MACHINEGUN_6:
 	case MZ2_SOLDIER_MACHINEGUN_7:
 	case MZ2_SOLDIER_MACHINEGUN_8:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand	() & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.soldierMachGunSfx, 1, ATTN_NORM, 0);
@@ -326,7 +326,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_GUNNER_MACHINEGUN_6:
 	case MZ2_GUNNER_MACHINEGUN_7:
 	case MZ2_GUNNER_MACHINEGUN_8:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.gunnerMachGunSfx, 1, ATTN_NORM, 0);
@@ -341,7 +341,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_SUPERTANK_MACHINEGUN_5:
 	case MZ2_SUPERTANK_MACHINEGUN_6:
 	case MZ2_TURRET_MACHINEGUN:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.machGunSfx, 1, ATTN_NORM, 0);
@@ -355,7 +355,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_BOSS2_MACHINEGUN_L5:
 	case MZ2_CARRIER_MACHINEGUN_L1:
 	case MZ2_CARRIER_MACHINEGUN_L2:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.machGunSfx, 1, ATTN_NONE, 0);
@@ -443,7 +443,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_TANK_MACHINEGUN_17:
 	case MZ2_TANK_MACHINEGUN_18:
 	case MZ2_TANK_MACHINEGUN_19:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+		//CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.tankMachGunSfx[(rand () % 5)], 1, ATTN_NORM, 0);
@@ -527,7 +527,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_JORG_MACHINEGUN_L4:
 	case MZ2_JORG_MACHINEGUN_L5:
 	case MZ2_JORG_MACHINEGUN_L6:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		S_StartSound (NULL, ent, CHAN_WEAPON, clMedia.sfx.mz2.jorgMachGunSfx, 1, ATTN_NORM, 0);
@@ -540,7 +540,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_JORG_MACHINEGUN_R4:
 	case MZ2_JORG_MACHINEGUN_R5:
 	case MZ2_JORG_MACHINEGUN_R6:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		break;
@@ -558,7 +558,7 @@ void CL_ParseMonsterMuzzleFlash ()
 	case MZ2_BOSS2_MACHINEGUN_R5:
 	case MZ2_CARRIER_MACHINEGUN_R1:
 	case MZ2_CARRIER_MACHINEGUN_R2:
-		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
+//		CL_MachinegunEjectBrass (cent, 1, monster_flash_offset[flash][0], monster_flash_offset[flash][1], monster_flash_offset[flash][2]);
 		CL_DynamicLight (origin, 200 + (rand () & 31), 1, 1, 0, false, 1);
 		CL_SmokePuffParticles (origin, 3, 1);
 		break;

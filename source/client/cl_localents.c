@@ -385,7 +385,7 @@ static void CL_AddEjectBrass (localEntity_t *le){
 
 		// Play a bounce sound
 		if (le->leFlags & LE_BOUNCESOUND){
-			S_StartSound(trace.endpos, 0, 0, le->bounceSound, 1, ATTN_NORM, 0);
+			S_StartSound(trace.endpos, 0, CHAN_AUTO, le->bounceSound, 1, ATTN_NORM, 0);
 
 			// Only play it once, otherwise it gets too noisy
 			le->leFlags &= ~LE_BOUNCESOUND;
@@ -845,7 +845,7 @@ void CL_LaserBeam (const vec3_t start, const vec3_t end, int width, int color, b
  CL_MachinegunEjectBrass
  =================
 */
-void CL_MachinegunEjectBrass (const centity_t *cent, int count, float x, float y, float z){
+void CL_MachinegunEjectBrass (centity_t *cent, int count, float x, float y, float z){
 
 	localEntity_t	*le;
 	vec3_t			velocity;
@@ -876,9 +876,9 @@ void CL_MachinegunEjectBrass (const centity_t *cent, int count, float x, float y
 		le->startTime = cl.time;
 		le->endTime = le->startTime + cl_brassTime->integer + (cl_brassTime->integer / 4) * frand();
 
-		le->origin[0] = cent->current.origin[0] + (x * axis[0][0] + y * axis[1][0] + z * axis[2][0]);
-		le->origin[1] = cent->current.origin[1] + (x * axis[0][1] + y * axis[1][1] + z * axis[2][1]);
-		le->origin[2] = cent->current.origin[2] + (x * axis[0][2] + y * axis[1][2] + z * axis[2][2]);
+		cent->current.origin[0] = le->origin[0] + (x * axis[0][0] + y * axis[1][0] + z * axis[2][0]);
+		cent->current.origin[1] = le->origin[1] + (x * axis[0][1] + y * axis[1][1] + z * axis[2][1]);
+		cent->current.origin[2] = le->origin[2] + (x * axis[0][2] + y * axis[1][2] + z * axis[2][2]);
 
 		VectorSet(velocity, 20 * crand(), -50 + 40 * crand(), 100 + 50 * crand());
 
@@ -894,7 +894,7 @@ void CL_MachinegunEjectBrass (const centity_t *cent, int count, float x, float y
 		le->gravity = -400;
 
 		le->bounceFactor = 1.2;
-		le->bounceSound = cl.media.sfxMachinegunBrass;
+		le->bounceSound = clMedia.sfx.machinegunBrass[(rand()&10)];
 
 		angles[0] = cent->current.angles[0] + (rand() & 31);
 		angles[1] = cent->current.angles[1] + (rand() & 31);
@@ -969,7 +969,7 @@ void CL_ShotgunEjectBrass (const centity_t *cent, int count, float x, float y, f
 		le->gravity = -300;
 
 		le->bounceFactor = 0.8;
-		le->bounceSound = cl.media.sfxShotgunBrass;
+		le->bounceSound = clMedia.sfx.shotgunBrass[(rand()&2)];
 
 		angles[0] = cent->current.angles[0] + (rand() & 31);
 		angles[1] = cent->current.angles[1] + (rand() & 31);
@@ -1018,7 +1018,7 @@ void CL_Bleed (const vec3_t org, const vec3_t dir, int count, qboolean green){
 
 		if (!(i % 4)){
 			le->leFlags |= LE_LEAVEMARK;
-			le->markShader = cl.media.bloodMarkShaders[type][rand() % 6];
+			le->markShader = clMedia.bloodMarkMaterials[type][rand() % 8];
 		}
 
 		le->entity.entityType = ET_SPRITE;
@@ -1077,7 +1077,7 @@ void CL_BloodTrail (const vec3_t start, const vec3_t end, qboolean green){
 
 		if (!(i % 2)){
 			le->leFlags |= LE_LEAVEMARK;
-			le->markShader = cl.media.bloodMarkShaders[type][rand() % 6];
+			le->markShader = clMedia.bloodMarkMaterials[type][rand() % 8];
 		}
 
 		le->entity.entityType = ET_SPRITE;
